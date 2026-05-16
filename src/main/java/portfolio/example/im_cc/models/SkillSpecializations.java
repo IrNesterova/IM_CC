@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 public class SkillSpecializations {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

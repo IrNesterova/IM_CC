@@ -2,11 +2,13 @@ package portfolio.example.im_cc.models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Table
 @Entity
 public class Faction {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     public void setId(Long id) {
@@ -20,5 +22,9 @@ public class Faction {
     @Column(columnDefinition = "text")
     private String name;
 
+    @Transient
+    private List<Talent> talentList;
 
+    @Transient
+    private List<Skill> skillList;
 }

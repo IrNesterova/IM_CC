@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 @Entity
 public class Specialization {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(columnDefinition = "text")
     private String name;

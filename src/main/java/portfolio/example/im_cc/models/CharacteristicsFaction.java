@@ -6,13 +6,15 @@ import jakarta.persistence.*;
 @Entity
 public class CharacteristicsFaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
+    @JoinColumn
     private Faction faction;
 
     @ManyToOne
+    @JoinColumn
     private Characteristics characteristics;
 
     private boolean primaryChar;

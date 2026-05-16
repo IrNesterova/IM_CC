@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Primary;
 @Table(name="characteristics")
 public class Characteristics {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(columnDefinition = "text")
