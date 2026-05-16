@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Imperium Maledictum — Origin Selection</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=EB+Garamond:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        :root{
+            --bg:#090807;
+            --panel:#15120f;
+            --gold:#b89b5e;
+            --gold-dark:#6b572d;
+            --red:#6a1c18;
+            --bone:#e4dbc9;
+            --text:#cdc4b5;
+            --muted:#948a7b;
+            --line:rgba(184,155,94,0.18);
+        }
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            background:
+                    linear-gradient(rgba(0,0,0,0.82), rgba(0,0,0,0.92)),
+                    url("https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2200&auto=format&fit=crop");
+
+            background-size:cover;
+            background-position:center;
+            background-attachment:fixed;
+
+            color:var(--text);
+
+            font-family:'EB Garamond',serif;
+
+            min-height:100vh;
+        }
+
+        body::before{
+            content:"";
+
+            position:fixed;
+            inset:0;
+
+            background:
+                    radial-gradient(circle at top,
+                    rgba(184,155,94,0.08),
+                    transparent 35%);
+
+            pointer-events:none;
+        }
+
+        .noise{
+            position:fixed;
+            inset:0;
+
+            background-image:url("https://www.transparenttextures.com/patterns/dark-leather.png");
+            opacity:0.16;
+
+            pointer-events:none;
+        }
+
+        /* ========================= */
+        /* HEADER */
+        /* ========================= */
+
+        .header{
+            text-align:center;
+
+            padding:70px 20px 40px;
+        }
+
+        .eyebrow{
+            color:var(--gold);
+
+            letter-spacing:4px;
+            text-transform:uppercase;
+
+            font-size:13px;
+
+            margin-bottom:20px;
+        }
+
+        h1{
+            font-family:'Cinzel',serif;
+
+            font-size:72px;
+            line-height:0.95;
+
+            color:var(--bone);
+
+            text-transform:uppercase;
+
+            margin-bottom:25px;
+        }
+
+        h1 span{
+            color:var(--gold);
+        }
+
+        .subtitle{
+            max-width:850px;
+            margin:auto;
+
+            color:var(--text);
+
+            font-size:24px;
+            line-height:1.7;
+        }
+
+        .separator{
+            width:240px;
+            height:2px;
+
+            margin:30px auto;
+
+            background:
+                    linear-gradient(
+                            90deg,
+                            transparent,
+                            var(--gold),
+                            transparent
+                    );
+        }
+
+        /* ========================= */
+        /* ORIGIN GRID */
+        /* ========================= */
+
+        .container{
+            width:100%;
+            max-width:1500px;
+
+            margin:auto;
+
+            padding:40px;
+        }
+
+        .origin-grid{
+            display:grid;
+
+            grid-template-columns:repeat(auto-fit, minmax(350px, 1fr));
+
+            gap:28px;
+        }
+
+        .origin-card{
+            position:relative;
+
+            background:
+                    linear-gradient(
+                            180deg,
+                            rgba(28,24,20,0.96),
+                            rgba(12,10,9,0.98)
+                    );
+
+            border:1px solid var(--line);
+
+            padding:34px;
+
+            transition:0.28s ease;
+
+            overflow:hidden;
+
+            min-height:360px;
+
+            display:flex;
+            flex-direction:column;
+        }
+
+        .origin-card::before{
+            content:"";
+
+            position:absolute;
+
+            top:0;
+            left:0;
+
+            width:100%;
+            height:4px;
+
+            background:
+                    linear-gradient(
+                            90deg,
+                            transparent,
+                            var(--gold),
+                            transparent
+                    );
+
+            opacity:0;
+            transition:0.3s;
+        }
+
+        .origin-card:hover{
+            transform:translateY(-8px);
+
+            border-color:rgba(184,155,94,0.35);
+
+            box-shadow:
+                    0 0 30px rgba(0,0,0,0.45);
+        }
+
+        .origin-card:hover::before{
+            opacity:1;
+        }
+
+        .origin-id{
+            color:var(--muted);
+
+            font-size:13px;
+
+            letter-spacing:2px;
+
+            text-transform:uppercase;
+
+            margin-bottom:16px;
+        }
+
+        .origin-name{
+            font-family:'Cinzel',serif;
+
+            color:var(--gold);
+
+            font-size:34px;
+
+            margin-bottom:20px;
+
+            line-height:1.1;
+        }
+
+        .origin-description{
+            color:var(--text);
+
+            font-size:21px;
+
+            line-height:1.7;
+
+            margin-bottom:28px;
+
+            flex-grow:1;
+        }
+
+        .origin-examples{
+            border-top:1px solid rgba(184,155,94,0.12);
+
+            padding-top:18px;
+
+            margin-top:auto;
+        }
+
+        .origin-examples-title{
+            color:var(--gold);
+
+            font-size:15px;
+
+            letter-spacing:2px;
+
+            text-transform:uppercase;
+
+            margin-bottom:12px;
+        }
+
+        .origin-examples-text{
+            color:var(--muted);
+
+            font-size:18px;
+
+            line-height:1.6;
+        }
+
+        /* ========================= */
+        /* BUTTON */
+        /* ========================= */
+
+        .select-btn{
+            width:100%;
+
+            margin-top:30px;
+
+            padding:18px 24px;
+
+            border:none;
+
+            cursor:pointer;
+
+            font-family:'Cinzel',serif;
+
+            font-size:16px;
+            font-weight:700;
+
+            letter-spacing:1px;
+
+            color:#140f08;
+
+            background:
+                    linear-gradient(
+                            180deg,
+                            #d0b67c 0%,
+                            #947743 100%
+                    );
+
+            transition:0.25s ease;
+        }
+
+        .select-btn:hover{
+            transform:translateY(-3px);
+
+            background:
+                    linear-gradient(
+                            180deg,
+                            #e0c58b 0%,
+                            #a17f48 100%
+                    );
+        }
+
+        /* ========================= */
+        /* RESPONSIVE */
+        /* ========================= */
+
+        @media(max-width:900px){
+
+            h1{
+                font-size:54px;
+            }
+
+            .subtitle{
+                font-size:20px;
+            }
+        }
+
+        @media(max-width:600px){
+
+            .container{
+                padding:20px;
+            }
+
+            h1{
+                font-size:42px;
+            }
+
+            .origin-name{
+                font-size:28px;
+            }
+
+            .origin-description{
+                font-size:18px;
+            }
+
+            .origin-grid{
+                grid-template-columns:1fr;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="noise"></div>
+
+<!-- ========================= -->
+<!-- HEADER -->
+<!-- ========================= -->
+
+<section class="header">
+
+    <div class="eyebrow">
+        WARHAMMER 40,000 ROLEPLAY
+    </div>
+
+    <h1>
+        Choose Your<br>
+        <span>Origin</span>
+    </h1>
+
+    <div class="separator"></div>
+
+    <p class="subtitle">
+        Каждый слуга Империума рождается в определённом мире.
+        Ваше происхождение определяет взгляд на галактику,
+        навыки выживания и место в бесконечной войне человечества.
+    </p>
+
+</section>
+
+<!-- ========================= -->
+<!-- ORIGIN LIST -->
+<!-- ========================= -->
+
+<div class="container">
+
+    <div class="origin-grid">
+
+        <!-- CARD -->
+        <div class="origin-card"
+             th:each="origin : ${listAllOrigins}">
+
+            <div class="origin-name"
+                 th:text="${origin.name}">
+            </div>
+
+            <div class="origin-examples">
+
+                <div class="origin-examples-title">
+                    Examples
+                </div>
+
+                <div class="origin-examples-text"
+                     th:text="${origin.examples}">
+                    Examples
+                </div>
+
+            </div>
+            <div class="origin-description"
+                 th:text="${origin.description}">
+                Description
+            </div>
+
+
+            <div class="origin-examples" th:each="primeChar, iterStat: ${origin.primaryCharacteristsics}">
+                <th:block th:if="${iterStat.first}">You receive +5 to </th:block>
+                <th:block th:text="${primeChar.full_name}"></th:block>
+            </div>
+
+
+            <div class="origin-examples">
+                <th:block th:each="secChar, iterStat: ${origin.secondaryCharacteristsics}">
+                    <th:block th:if="${iterStat.first}">You also receive +5 to </th:block>
+                    <th:block th:text="${secChar.full_name}"></th:block>
+                    <th:block th:if="${!iterStat.last}"> or </th:block>
+                </th:block>
+
+            </div>
+
+            <!-- SELECT BUTTON -->
+
+            <form th:action="@{/character/origins}"
+                  method="post">
+
+                <input type="hidden"
+                       name="originId"
+                       th:value="${origin.id}">
+
+                <button type="submit"
+                        class="select-btn">
+
+                    SELECT ORIGIN
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
