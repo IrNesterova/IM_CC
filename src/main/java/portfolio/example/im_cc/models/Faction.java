@@ -8,7 +8,7 @@ import java.util.List;
 @Entity
 public class Faction {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     public void setId(Long id) {
@@ -27,4 +27,21 @@ public class Faction {
 
     @Transient
     private List<Skill> skillList;
+
+
+    public List<Talent> getTalentList() {
+        return talentList;
+    }
+
+    public void setTalentList(List<Talent> talentList) {
+        this.talentList = talentList;
+    }
+
+    public List<Skill> getSkillList() {
+        return skillList;
+    }
+
+    public void setSkillList(List<Skill> skillList) {
+        this.skillList = skillList;
+    }
 }

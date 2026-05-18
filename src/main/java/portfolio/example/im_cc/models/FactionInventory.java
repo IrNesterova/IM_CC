@@ -4,34 +4,16 @@ import jakarta.persistence.*;
 
 @Table
 @Entity
-public class SkillFactions {
+public class FactionInventory {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-
-    }
     @ManyToOne
-    @JoinColumn
     private Faction faction;
     @ManyToOne
-    @JoinColumn
-    private Skill skill;
-
-    public Skill getSkill() {
-        return skill;
-    }
-
-    public void setSkill(Skill skill) {
-        this.skill = skill;
-    }
+    private Inventory inventory;
 
     public Faction getFaction() {
         return faction;
@@ -39,5 +21,13 @@ public class SkillFactions {
 
     public void setFaction(Faction faction) {
         this.faction = faction;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 }

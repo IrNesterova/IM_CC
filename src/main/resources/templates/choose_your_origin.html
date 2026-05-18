@@ -58,7 +58,26 @@
 
             pointer-events:none;
         }
+        .origin-select{
+            padding:14px 18px;
 
+            background:
+                    linear-gradient(
+                            180deg,
+                            rgba(22,18,14,0.98),
+                            rgba(10,8,7,1)
+                    );
+
+            border:1px solid rgba(184,155,94,0.16);
+
+            color:#e7dcc5;
+
+            font-family:'EB Garamond',serif;
+
+            font-size:18px;
+
+            outline:none;
+        }
         .noise{
             position:fixed;
             inset:0;
@@ -431,23 +450,22 @@
             </div>
 
 
-            <div class="origin-examples">
-                <th:block th:each="secChar, iterStat: ${origin.secondaryCharacteristsics}">
-                    <th:block th:if="${iterStat.first}">You also receive +5 to </th:block>
-                    <th:block th:text="${secChar.full_name}"></th:block>
-                    <th:block th:if="${!iterStat.last}"> or </th:block>
-                </th:block>
-
-            </div>
+            AND
 
             <!-- SELECT BUTTON -->
 
-            <form th:action="@{/character/origins}"
-                  method="post">
-
+            <form th:action="@{/character/origins}" method="post">
+                <select class="origin-select" name="secondaryChar_ID">
+                    <option
+                            th:each="secChar, iterStat: ${origin.secondaryCharacteristsics}"
+                            th:value="${secChar.name}"
+                            th:text="${secChar.full_name}">
+                    </option>
+                </select>
                 <input type="hidden"
                        name="originId"
                        th:value="${origin.id}">
+
 
                 <button type="submit"
                         class="select-btn">
