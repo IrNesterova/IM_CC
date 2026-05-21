@@ -1,0 +1,20 @@
+package portfolio.example.im_cc.models;
+
+import jakarta.persistence.*;
+
+import java.util.List;
+
+@Entity
+public class FactionInventoryChoiceGroup {
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private Long id;
+
+   @ManyToOne
+   private Faction faction;
+
+   private Integer choicesRequired;
+
+   @Transient
+   private List<Inventory> choices;
+}
