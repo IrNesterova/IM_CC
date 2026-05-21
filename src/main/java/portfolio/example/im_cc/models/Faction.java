@@ -38,7 +38,7 @@ public class Faction {
     @Transient
     private List<Characteristics> secondaryCharacteristics;
     @Transient
-    private List<FactionInventoryChoiceGroup> choiceGroups;
+    private List<FactionChoiceGroup> choiceGroups;
 
     public List<Talent> getTalentList() {
         return talentList;

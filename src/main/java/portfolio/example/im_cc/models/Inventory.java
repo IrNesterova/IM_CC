@@ -1,6 +1,8 @@
 package portfolio.example.im_cc.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 @Entity
 @Table
@@ -11,6 +13,12 @@ public class Inventory {
     @Column(columnDefinition = "text")
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private InventoryCategory inventoryCategory;
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private InventorySubcategory inventorySubcategory;
     public String getName() {
         return name;
     }

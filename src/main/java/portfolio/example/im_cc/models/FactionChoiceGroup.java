@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-public class FactionInventoryChoiceGroup {
+public class FactionChoiceGroup {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long id;
@@ -16,5 +16,5 @@ public class FactionInventoryChoiceGroup {
    private Integer choicesRequired;
 
    @Transient
-   private List<Inventory> choices;
+   private List<ChoiceGroup>  choices;
 }
