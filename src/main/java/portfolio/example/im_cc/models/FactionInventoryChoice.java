@@ -9,7 +9,7 @@ public class FactionInventoryChoice {
     private Long id;
 
     @ManyToOne
-    private FactionInventoryChoiceGroup factionInventoryChoiceGroup;
+    private FactionInventoryChoice factionInventoryChoiceGroup;
 
     @ManyToOne
     private Inventory inventory;
