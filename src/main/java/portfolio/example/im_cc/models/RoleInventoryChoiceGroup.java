@@ -1,7 +1,6 @@
 package portfolio.example.im_cc.models;
 
 import jakarta.persistence.*;
-import jdk.jfr.Unsigned;
 
 @Entity
 public class RoleInventoryChoiceGroup {
@@ -10,16 +9,16 @@ public class RoleInventoryChoiceGroup {
     private Long id;
 
     @ManyToOne
-    private RoleInventoryChoiceGroup roleChoice;
+    private RoleChoiceGroup roleChoiceGroup;
     @ManyToOne
     private Inventory inventory;
 
-    public RoleInventoryChoiceGroup getRoleChoice() {
-        return roleChoice;
+    public RoleChoiceGroup getRoleChoiceGroup() {
+        return roleChoiceGroup;
     }
 
-    public void setRoleChoice(RoleInventoryChoiceGroup roleChoice) {
-        this.roleChoice = roleChoice;
+    public void setRoleChoiceGroup(RoleChoiceGroup roleChoiceGroup) {
+        this.roleChoiceGroup = roleChoiceGroup;
     }
 
     public Inventory getInventory() {

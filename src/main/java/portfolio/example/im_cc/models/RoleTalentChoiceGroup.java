@@ -1,7 +1,6 @@
 package portfolio.example.im_cc.models;
 
 import jakarta.persistence.*;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @Entity
 public class RoleTalentChoiceGroup {
@@ -10,7 +9,7 @@ public class RoleTalentChoiceGroup {
     private Long id;
 
     @ManyToOne
-    private RoleInventoryChoiceGroup roleChoice;
+    private RoleChoiceGroup roleChoiceGroup;
     @ManyToOne
     private Talent talent;
 
@@ -30,11 +29,11 @@ public class RoleTalentChoiceGroup {
         return id;
     }
 
-    public RoleInventoryChoiceGroup getRoleChoice() {
-        return roleChoice;
+    public RoleChoiceGroup getRoleChoiceGroup() {
+        return roleChoiceGroup;
     }
 
-    public void setRoleChoice(RoleInventoryChoiceGroup roleChoice) {
-        this.roleChoice = roleChoice;
+    public void setRoleChoiceGroup(RoleChoiceGroup roleChoiceGroup) {
+        this.roleChoiceGroup = roleChoiceGroup;
     }
 }

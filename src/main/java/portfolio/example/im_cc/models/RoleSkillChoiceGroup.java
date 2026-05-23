@@ -9,7 +9,7 @@ public class RoleSkillChoiceGroup {
     private Long id;
 
     @ManyToOne
-    private RoleInventoryChoiceGroup RoleChoice;
+    private RoleChoiceGroup roleChoiceGroup;
 
     @ManyToOne
     private Skill skill;
@@ -22,12 +22,12 @@ public class RoleSkillChoiceGroup {
         this.id = id;
     }
 
-    public RoleInventoryChoiceGroup getRoleChoice() {
-        return RoleChoice;
+    public RoleChoiceGroup getRoleChoiceGroup() {
+        return roleChoiceGroup;
     }
 
-    public void setRoleChoice(RoleInventoryChoiceGroup roleChoice) {
-        RoleChoice = roleChoice;
+    public void setRoleChoiceGroup(RoleChoiceGroup roleChoiceGroup) {
+        this.roleChoiceGroup = roleChoiceGroup;
     }
 
     public Skill getSkill() {

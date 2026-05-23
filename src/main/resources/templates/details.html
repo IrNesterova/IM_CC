@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imperium Maledictum — Adding Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=EB+Garamond:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090807;
+            --panel: #15120f;
+            --gold: #b89b5e;
+            --gold-dark: #6d562f;
+            --bone: #e7dcc5;
+            --text: #d2c8b8;
+            --muted: #988d7c;
+            --line: rgba(184,155,94,0.15);
+            --red: #5a1815;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background:
+                linear-gradient(rgba(0,0,0,0.88), rgba(0,0,0,0.96)),
+                url("https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2200&auto=format&fit=crop");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text);
+            font-family: 'EB Garamond', serif;
+            min-height: 100vh;
+        }
+
+        .noise {
+            position: fixed;
+            inset: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
+            opacity: 0.14;
+            pointer-events: none;
+        }
+
+        .header {
+            text-align: center;
+            padding: 70px 20px 40px;
+        }
+
+        .eyebrow {
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 64px;
+            line-height: 0.95;
+            text-transform: uppercase;
+            color: var(--bone);
+            margin-bottom: 24px;
+        }
+
+        h1 span { color: var(--gold); }
+
+        .separator {
+            width: 240px;
+            height: 2px;
+            margin: 30px auto;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .subtitle {
+            max-width: 720px;
+            margin: auto;
+            font-size: 22px;
+            line-height: 1.7;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 40px 40px 80px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+        }
+
+        .section {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            padding: 36px 40px;
+            background: linear-gradient(180deg, rgba(28,24,20,0.96), rgba(10,8,7,0.98));
+            border: 1px solid var(--line);
+            position: relative;
+        }
+
+        .section::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 20px;
+        }
+
+        .section-note {
+            font-size: 17px;
+            color: var(--muted);
+            font-style: italic;
+            margin-top: -12px;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .field.full { grid-column: 1 / -1; }
+
+        label {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        label .optional {
+            font-family: 'EB Garamond', serif;
+            font-size: 13px;
+            color: var(--muted);
+            text-transform: none;
+            letter-spacing: 0;
+            margin-left: 6px;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(184,155,94,0.2);
+            color: var(--bone);
+            font-family: 'EB Garamond', serif;
+            font-size: 18px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: rgba(184,155,94,0.5);
+        }
+
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        select option {
+            background: #15120f;
+            color: var(--bone);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .field-with-roll {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .field-with-roll input,
+        .field-with-roll select {
+            flex: 1;
+        }
+
+        .roll-btn {
+            padding: 12px 14px;
+            background: rgba(184,155,94,0.08);
+            border: 1px solid rgba(184,155,94,0.2);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .roll-btn:hover {
+            background: rgba(184,155,94,0.15);
+            border-color: rgba(184,155,94,0.4);
+        }
+
+        .submit-btn {
+            align-self: center;
+            min-width: 320px;
+            padding: 20px 32px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #140f08;
+            background: linear-gradient(180deg, #d0b67c 0%, #947743 100%);
+            transition: 0.25s ease;
+        }
+
+        .submit-btn:hover { transform: translateY(-3px); }
+    </style>
+</head>
+
+<body>
+
+<div class="noise"></div>
+
+<section class="header">
+    <div class="eyebrow">WARHAMMER 40,000 ROLEPLAY</div>
+    <h1>Adding<br><span>Detail</span></h1>
+    <div class="separator"></div>
+    <div class="subtitle">
+        The numbers on your sheet are only part of your character's story.
+        Now it is time to determine the details that flesh them out as a person.
+    </div>
+</section>
+
+<div class="container">
+<form th:action="@{/character/details}" method="post">
+
+    <!-- ================================================================
+         IDENTITY
+    ================================================================ -->
+    <div class="section">
+        <div class="section-title">Identity</div>
+
+        <div class="field-grid">
+
+            <div class="field full">
+                <label for="characterName">Name <span style="color:var(--red)">*</span></label>
+                <input type="text" id="characterName" name="characterName"
+                       placeholder="e.g. Horst, Azararch, Killian..." required>
+            </div>
+
+            <div class="field">
+                <label for="age">Age <span class="optional">(optional)</span></label>
+                <div class="field-with-roll">
+                    <input type="text" id="age" name="age" placeholder="e.g. 24">
+                    <button type="button" class="roll-btn" onclick="rollAge()">Roll</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="height">Height <span class="optional">(optional)</span></label>
+                <div class="field-with-roll">
+                    <input type="text" id="height" name="height" placeholder="e.g. 5'11&quot;">
+                    <button type="button" class="roll-btn" onclick="rollHeight()">Roll</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================================================================
+         APPEARANCE
+    ================================================================ -->
+    <div class="section">
+        <div class="section-title">Physical Appearance</div>
+        <p class="section-note">Optional — roll randomly or fill in freely.</p>
+
+        <div class="field-grid">
+
+            <div class="field">
+                <label for="eyeType">Eyes <span class="optional">(optional)</span></label>
+                <div class="field-with-roll">
+                    <select id="eyeType" name="eyeType">
+                        <option value="">— choose or leave blank —</option>
+                        <option>Mournful</option><option>Hard</option><option>Old</option>
+                        <option>Focused</option><option>Wild</option><option>Striking</option>
+                        <option>Bitter</option><option>Hopeful</option><option>Suspicious</option>
+                        <option>Furious</option><option>Warm</option><option>Dead</option>
+                        <option>Fiery</option><option>Judgemental</option><option>Mesmerising</option>
+                        <option>Forlorn</option><option>Curious</option><option>Cold</option>
+                        <option>Haunted</option><option>Calculating</option>
+                    </select>
+                    <button type="button" class="roll-btn" onclick="rollSelect('eyeType')">Roll</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="hairColor">Hair Colour <span class="optional">(optional)</span></label>
+                <div class="field-with-roll">
+                    <select id="hairColor" name="hairColor">
+                        <option value="">— choose or leave blank —</option>
+                        <option>White/Grey</option><option>Black</option>
+                        <option>Brown/Auburn</option><option>Red/Orange</option>
+                        <option>Blond</option><option>Green</option><option>Blue</option>
+                        <option>Purple</option><option>Bare-headed</option><option>Multiple</option>
+                    </select>
+                    <button type="button" class="roll-btn" onclick="rollSelect('hairColor')">Roll</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="hairStyle">Hair Style <span class="optional">(optional)</span></label>
+                <div class="field-with-roll">
+                    <select id="hairStyle" name="hairStyle">
+                        <option value="">— choose or leave blank —</option>
+                        <option>Unkempt</option><option>Braided</option><option>Mohawk</option>
+                        <option>Transplanted from an animal</option><option>Long</option>
+                        <option>Cropped</option><option>Tight curls</option>
+                        <option>Large and elaborate</option><option>Metal wires or spikes</option>
+                        <option>Rivets, wire mesh, or plate</option>
+                    </select>
+                    <button type="button" class="roll-btn" onclick="rollSelect('hairStyle')">Roll</button>
+                </div>
+            </div>
+
+            <div class="field full">
+                <label for="distinguishingFeatures">Distinguishing Features <span class="optional">(optional)</span></label>
+                <div class="field-with-roll" style="align-items:stretch">
+                    <textarea id="distinguishingFeatures" name="distinguishingFeatures"
+                              placeholder="e.g. Heavily scarred from combat. Numerous cranial plugs jut from the scalp..."></textarea>
+                    <button type="button" class="roll-btn" style="align-self:flex-start" onclick="rollFeature()">Roll</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================================================================
+         GOALS
+    ================================================================ -->
+    <div class="section">
+        <div class="section-title">Goals</div>
+        <p class="section-note">Achieving a short-term goal earns 50 XP. A long-term goal earns 500 XP.</p>
+
+        <div class="field-grid">
+
+            <div class="field full">
+                <label for="shortTermGoal">Short-term Goal <span class="optional">(optional)</span></label>
+                <textarea id="shortTermGoal" name="shortTermGoal"
+                          placeholder="An outcome you wish to achieve within days or weeks. E.g. Take revenge against a local gang member."></textarea>
+            </div>
+
+            <div class="field full">
+                <label for="longTermGoal">Long-term Goal <span class="optional">(optional)</span></label>
+                <textarea id="longTermGoal" name="longTermGoal"
+                          placeholder="An ambition that will take months or years. E.g. Destroy a major cult of the Ruinous Powers."></textarea>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================================================================
+         CONNECTIONS
+    ================================================================ -->
+    <div class="section">
+        <div class="section-title">Connections</div>
+        <p class="section-note">Fragments of shared history that tie you to other characters and your Patron.</p>
+
+        <div class="field">
+            <label for="connections">Connections <span class="optional">(optional)</span></label>
+            <textarea id="connections" name="connections" style="min-height:130px"
+                      placeholder="E.g. Horst owes me a significant sum of solars. I once saw Azararch reading a strange tome."></textarea>
+        </div>
+    </div>
+
+    <button type="submit" class="submit-btn">Proceed to Summary</button>
+
+</form>
+</div>
+
+<script>
+    // ── Age roll ──────────────────────────────────────────────
+    function d10() { return Math.floor(Math.random() * 10) + 1; }
+
+    function rollAge() {
+        // Default: Recruit 17+d10
+        const age = 17 + d10();
+        document.getElementById('age').value = age;
+    }
+
+    // ── Height roll ───────────────────────────────────────────
+    function rollHeight() {
+        const inches = 57 + d10() + d10(); // 4'9" + 2d10"
+        const feet = Math.floor(inches / 12);
+        const rem  = inches % 12;
+        document.getElementById('height').value = `${feet}'${rem}"`;
+    }
+
+    // ── Generic select randomiser ─────────────────────────────
+    function rollSelect(id) {
+        const sel = document.getElementById(id);
+        const opts = Array.from(sel.options).filter(o => o.value !== '');
+        if (!opts.length) return;
+        sel.value = opts[Math.floor(Math.random() * opts.length)].value;
+    }
+
+    // ── Distinguishing features ───────────────────────────────
+    const FEATURES = [
+        "You have a tattoo of the Aquila on your forehead.",
+        "You smell faintly of corpse starch.",
+        "You have a faded electoo you'd rather forget about.",
+        "Pox marks or another lingering sign of an old illness mar your skin.",
+        "Your ears have been replaced with bulky but functional augmetics.",
+        "Your teeth are made of metal.",
+        "Your cornea is tattooed.",
+        "You are heavily scarred, perhaps from combat or an industrial accident.",
+        "Your teeth are filed to sharp points.",
+        "Parts of your skull are covered by a metal plate.",
+        "You bear an unexplained scar in the shape of the Aquila.",
+        "Your eyelids are heavily tattooed with High Gothic script.",
+        "You have a birthmark in the shape of a skull.",
+        "You have been branded with the symbol of a sect or cult.",
+        "Your pupils are completely white.",
+        "Your skin is exceptionally pallid.",
+        "Your muscles are overly defined, perhaps from a life of strenuous labour.",
+        "Numerous cranial plugs jut from your scalp.",
+        "You are wrapped in scripture parchments and purity seals.",
+        "You are unremarkable — another infinitely replaceable cog in the machinery of the Imperium."
+    ];
+
+    function rollFeature() {
+        const f = FEATURES[Math.floor(Math.random() * FEATURES.length)];
+        const el = document.getElementById('distinguishingFeatures');
+        el.value = el.value ? el.value + '\n' + f : f;
+    }
+</script>
+
+</body>
+</html>

@@ -9,8 +9,8 @@ import portfolio.example.im_cc.models.Faction;
 import portfolio.example.im_cc.services.CharacteristicsServiceImpl;
 import portfolio.example.im_cc.services.FactionServiceImpl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -181,22 +181,51 @@ public class CharacterCreationController {
         }
 
         ccm.setFactionChoices(choices);
-        // =====================================================
-        // DEBUG
-        // =====================================================
-
-        System.out.println("Faction ID:");
-        System.out.println(ccm.getFactionId());
-
-        System.out.println("Characteristics after:");
-        System.out.println(ccm.getCharacteristics());
-
-        System.out.println("Skill Advances:");
-        System.out.println(ccm.getFactionSkillAdvances());
-
-        System.out.println("Faction Choices:");
-        System.out.println(ccm.getFactionChoices());
 
         return "redirect:/roles";
+    }
+
+    @PostMapping("/roles")
+    public String saveRoles(
+            @ModelAttribute("characterCreation") CharacterCreationModel ccm,
+            @RequestParam Map<String, String> params
+    ) {
+        ccm.setRoleId(Long.valueOf(params.get("roleId")));
+
+        Map<Long, List<Long>> roleChoices = new HashMap<>();
+
+        for (String key : params.keySet()) {
+            if (key.startsWith("roleChoice_")) {
+                Long groupId = Long.valueOf(key.replace("roleChoice_", ""));
+                String[] values = params.get(key).split(",");
+                List<Long> selected = new ArrayList<>();
+                for (String v : values) {
+                    if (!v.isBlank()) selected.add(Long.valueOf(v.trim()));
+                }
+                roleChoices.put(groupId, selected);
+            }
+        }
+
+        ccm.setRoleChoices(roleChoices);
+
+        return "redirect:/details";
+    }
+
+    @PostMapping("/details")
+    public String saveDetails(
+            @ModelAttribute("characterCreation") CharacterCreationModel ccm,
+            @RequestParam Map<String, String> params
+    ) {
+        ccm.setCharacterName(params.get("characterName"));
+        ccm.setAge(params.get("age"));
+        ccm.setEyeType(params.get("eyeType"));
+        ccm.setHairColor(params.get("hairColor"));
+        ccm.setHairStyle(params.get("hairStyle"));
+        ccm.setHeight(params.get("height"));
+        ccm.setDistinguishingFeatures(params.get("distinguishingFeatures"));
+        ccm.setShortTermGoal(params.get("shortTermGoal"));
+        ccm.setLongTermGoal(params.get("longTermGoal"));
+        ccm.setConnections(params.get("connections"));
+        return "redirect:/summary";
     }
 }

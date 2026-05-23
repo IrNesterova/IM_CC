@@ -2,14 +2,29 @@ package portfolio.example.im_cc.models;
 
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CharacterCreationModel {
     private Long originId;
     private Long factionId;
+    private Long roleId;
     private Map<String, String> characteristics = new HashMap<>();
     private Map<Long, Integer> factionSkillAdvances = new HashMap<>();
     private Map<Long, Long> factionChoices = new HashMap<>();
+    private Map<Long, List<Long>> roleChoices = new HashMap<>();
+
+    // Adding Detail
+    private String characterName;
+    private String age;
+    private String eyeType;
+    private String hairColor;
+    private String hairStyle;
+    private String height;
+    private String distinguishingFeatures;
+    private String shortTermGoal;
+    private String longTermGoal;
+    private String connections;
 
 
     public Map<String, String> getCharacteristics() {
@@ -51,4 +66,50 @@ public class CharacterCreationModel {
     public void setFactionId(Long factionId) {
         this.factionId = factionId;
     }
+
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
+    }
+
+    public Map<Long, List<Long>> getRoleChoices() {
+        return roleChoices;
+    }
+
+    public void setRoleChoices(Map<Long, List<Long>> roleChoices) {
+        this.roleChoices = roleChoices;
+    }
+
+    public String getCharacterName() { return characterName; }
+    public void setCharacterName(String characterName) { this.characterName = characterName; }
+
+    public String getAge() { return age; }
+    public void setAge(String age) { this.age = age; }
+
+    public String getEyeType() { return eyeType; }
+    public void setEyeType(String eyeType) { this.eyeType = eyeType; }
+
+    public String getHairColor() { return hairColor; }
+    public void setHairColor(String hairColor) { this.hairColor = hairColor; }
+
+    public String getHairStyle() { return hairStyle; }
+    public void setHairStyle(String hairStyle) { this.hairStyle = hairStyle; }
+
+    public String getHeight() { return height; }
+    public void setHeight(String height) { this.height = height; }
+
+    public String getDistinguishingFeatures() { return distinguishingFeatures; }
+    public void setDistinguishingFeatures(String distinguishingFeatures) { this.distinguishingFeatures = distinguishingFeatures; }
+
+    public String getShortTermGoal() { return shortTermGoal; }
+    public void setShortTermGoal(String shortTermGoal) { this.shortTermGoal = shortTermGoal; }
+
+    public String getLongTermGoal() { return longTermGoal; }
+    public void setLongTermGoal(String longTermGoal) { this.longTermGoal = longTermGoal; }
+
+    public String getConnections() { return connections; }
+    public void setConnections(String connections) { this.connections = connections; }
 }

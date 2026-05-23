@@ -8,7 +8,7 @@ public class RoleSpecializationChoiceGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    private RoleInventoryChoiceGroup roleChoice;
+    private RoleChoiceGroup roleChoiceGroup;
 
     @ManyToOne
     private Specialization specialization;
@@ -21,12 +21,12 @@ public class RoleSpecializationChoiceGroup {
         this.specialization = specialization;
     }
 
-    public RoleInventoryChoiceGroup getRoleChoice() {
-        return roleChoice;
+    public RoleChoiceGroup getRoleChoiceGroup() {
+        return roleChoiceGroup;
     }
 
-    public void setRoleChoice(RoleInventoryChoiceGroup roleChoice) {
-        this.roleChoice = roleChoice;
+    public void setRoleChoiceGroup(RoleChoiceGroup roleChoiceGroup) {
+        this.roleChoiceGroup = roleChoiceGroup;
     }
 
     public Long getId() {

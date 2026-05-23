@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Imperium Maledictum — Role Selection</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=EB+Garamond:wght@400;500;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        :root{
+            --bg:#090807;
+            --panel:#15120f;
+            --gold:#b89b5e;
+            --gold-dark:#6d562f;
+            --bone:#e7dcc5;
+            --text:#d2c8b8;
+            --muted:#988d7c;
+            --line:rgba(184,155,94,0.15);
+            --red:#5a1815;
+        }
+
+        *{ margin:0; padding:0; box-sizing:border-box; }
+
+        body{
+            background:
+                linear-gradient(rgba(0,0,0,0.88),rgba(0,0,0,0.96)),
+                url("https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2200&auto=format&fit=crop");
+            background-size:cover;
+            background-position:center;
+            background-attachment:fixed;
+            color:var(--text);
+            font-family:'EB Garamond',serif;
+            min-height:100vh;
+        }
+
+        .noise{
+            position:fixed;
+            inset:0;
+            background-image:url("https://www.transparenttextures.com/patterns/dark-leather.png");
+            opacity:0.14;
+            pointer-events:none;
+        }
+
+        .header{
+            text-align:center;
+            padding:70px 20px 40px;
+        }
+
+        .eyebrow{
+            color:var(--gold);
+            text-transform:uppercase;
+            letter-spacing:4px;
+            font-size:13px;
+            margin-bottom:18px;
+        }
+
+        h1{
+            font-family:'Cinzel',serif;
+            font-size:72px;
+            line-height:0.95;
+            text-transform:uppercase;
+            color:var(--bone);
+            margin-bottom:24px;
+        }
+
+        h1 span{ color:var(--gold); }
+
+        .separator{
+            width:240px;
+            height:2px;
+            margin:30px auto;
+            background:linear-gradient(90deg,transparent,var(--gold),transparent);
+        }
+
+        .subtitle{
+            max-width:900px;
+            margin:auto;
+            font-size:24px;
+            line-height:1.7;
+            color:var(--text);
+        }
+
+        .container{
+            width:100%;
+            max-width:1700px;
+            margin:auto;
+            padding:40px;
+        }
+
+        .role-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(700px,1fr));
+            gap:36px;
+        }
+
+        .role-card{
+            display:flex;
+            flex-direction:column;
+            gap:34px;
+            padding:42px;
+            background:linear-gradient(180deg,rgba(28,24,20,0.96),rgba(10,8,7,0.98));
+            border:1px solid var(--line);
+            position:relative;
+            overflow:hidden;
+            transition:0.28s ease;
+        }
+
+        .role-card::before{
+            content:"";
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:4px;
+            background:linear-gradient(90deg,transparent,var(--gold),transparent);
+            opacity:0;
+            transition:0.3s;
+        }
+
+        .role-card:hover{
+            transform:translateY(-6px);
+            border-color:rgba(184,155,94,0.28);
+            box-shadow:0 0 32px rgba(0,0,0,0.45);
+        }
+
+        .role-card:hover::before{ opacity:1; }
+
+        .role-name{
+            font-family:'Cinzel',serif;
+            font-size:42px;
+            color:var(--gold);
+            line-height:1.1;
+        }
+
+        .section{
+            display:flex;
+            flex-direction:column;
+            gap:16px;
+        }
+
+        .section-title{
+            font-family:'Cinzel',serif;
+            color:var(--gold);
+            text-transform:uppercase;
+            letter-spacing:1px;
+            font-size:18px;
+        }
+
+        .tag-list{
+            display:flex;
+            flex-wrap:wrap;
+            gap:12px;
+        }
+
+        .tag{
+            padding:10px 16px;
+            background:linear-gradient(180deg,rgba(184,155,94,0.08),rgba(184,155,94,0.02));
+            border:1px solid rgba(184,155,94,0.14);
+            color:var(--bone);
+            font-size:17px;
+        }
+
+        .description{
+            color:var(--muted);
+            font-size:18px;
+            line-height:1.6;
+        }
+
+        .choice-group{
+            display:flex;
+            flex-direction:column;
+            gap:16px;
+            padding:24px;
+            border:1px solid rgba(184,155,94,0.12);
+            background:linear-gradient(180deg,rgba(184,155,94,0.03),rgba(184,155,94,0.01));
+        }
+
+        .choice-option{
+            display:flex;
+            align-items:flex-start;
+            gap:16px;
+            padding:18px;
+            border:1px solid rgba(184,155,94,0.10);
+            background:rgba(0,0,0,0.22);
+            transition:0.2s ease;
+            cursor:pointer;
+        }
+
+        .choice-option:hover{ border-color:rgba(184,155,94,0.25); }
+
+        .choice-option input{ margin-top:4px; transform:scale(1.15); }
+
+        .option-label{
+            color:var(--bone);
+            font-size:18px;
+        }
+
+        .select-btn{
+            width:100%;
+            margin-top:auto;
+            padding:18px 24px;
+            border:none;
+            cursor:pointer;
+            font-family:'Cinzel',serif;
+            font-size:16px;
+            font-weight:700;
+            letter-spacing:1px;
+            color:#140f08;
+            background:linear-gradient(180deg,#d0b67c 0%,#947743 100%);
+            transition:0.25s ease;
+        }
+
+        .select-btn:hover{ transform:translateY(-3px); }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="noise"></div>
+
+<section class="header">
+
+    <div class="eyebrow">WARHAMMER 40,000 ROLEPLAY</div>
+
+    <h1>Choose Your<br><span>Role</span></h1>
+
+    <div class="separator"></div>
+
+    <div class="subtitle">
+        Your role defines your function within the warband —
+        your skills, equipment and purpose.
+    </div>
+
+</section>
+
+<div class="container">
+
+    <div class="role-grid">
+
+        <form class="role-card"
+              th:each="role : ${allRoles}"
+              th:action="@{/character/roles}"
+              method="post">
+
+            <input type="hidden"
+                   name="roleId"
+                   th:value="${role.id}">
+
+            <!-- NAME -->
+
+            <div class="role-name"
+                 th:text="${role.name}">
+            </div>
+
+            <!-- FIXED INVENTORY -->
+
+            <div class="section"
+                 th:if="${!#lists.isEmpty(role.inventoryList)}">
+
+                <div class="section-title">Starting Equipment</div>
+
+                <div class="tag-list">
+                    <div class="tag"
+                         th:each="item : ${role.inventoryList}"
+                         th:text="${item.name}">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CHOICE GROUPS -->
+
+            <div class="section"
+                 th:if="${!#lists.isEmpty(role.choiceGroups)}">
+
+                <div class="section-title">Choices</div>
+
+                <div class="choice-group"
+                     th:each="group : ${role.choiceGroups}">
+
+                    <div class="description"
+                         th:text="${'Choose ' + group.choicesRequired + ':'}">
+                    </div>
+
+                    <!-- TALENT OPTIONS -->
+
+                    <th:block th:if="${group.choiceType.name() == 'TALENT'}">
+                        <label class="choice-option"
+                               th:each="talent : ${group.talentOptions}">
+                            <input type="checkbox"
+                                   th:name="'roleChoice_' + ${group.id}"
+                                   th:value="${talent.id}"
+                                   th:attr="data-group=${group.id}, data-max=${group.choicesRequired}">
+                            <span class="option-label" th:text="${talent.name}"></span>
+                        </label>
+                    </th:block>
+
+                    <!-- INVENTORY OPTIONS -->
+
+                    <th:block th:if="${group.choiceType.name() == 'INVENTORY'}">
+                        <label class="choice-option"
+                               th:each="item : ${group.inventoryOptions}">
+                            <input type="checkbox"
+                                   th:name="'roleChoice_' + ${group.id}"
+                                   th:value="${item.id}"
+                                   th:attr="data-group=${group.id}, data-max=${group.choicesRequired}">
+                            <span class="option-label" th:text="${item.name}"></span>
+                        </label>
+                    </th:block>
+
+                    <!-- SKILL OPTIONS -->
+
+                    <th:block th:if="${group.choiceType.name() == 'SKILL'}">
+                        <label class="choice-option"
+                               th:each="skill : ${group.skillOptions}">
+                            <input type="checkbox"
+                                   th:name="'roleChoice_' + ${group.id}"
+                                   th:value="${skill.id}"
+                                   th:attr="data-group=${group.id}, data-max=${group.choicesRequired}">
+                            <span class="option-label" th:text="${skill.name}"></span>
+                        </label>
+                    </th:block>
+
+                    <!-- SPECIALIZATION OPTIONS -->
+
+                    <th:block th:if="${group.choiceType.name() == 'SPECIALIZATION'}">
+                        <label class="choice-option"
+                               th:each="spec : ${group.specializationOptions}">
+                            <input type="checkbox"
+                                   th:name="'roleChoice_' + ${group.id}"
+                                   th:value="${spec.id}"
+                                   th:attr="data-group=${group.id}, data-max=${group.choicesRequired}">
+                            <span class="option-label" th:text="${spec.name}"></span>
+                        </label>
+                    </th:block>
+
+                </div>
+
+            </div>
+
+            <!-- BUTTON -->
+
+            <button type="submit" class="select-btn">
+                SELECT ROLE
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+    document.querySelectorAll(".role-card").forEach(card => {
+
+        const groups = new Map();
+
+        card.querySelectorAll("input[type=checkbox]").forEach(cb => {
+            const groupId = cb.dataset.group;
+            const max = parseInt(cb.dataset.max);
+            if (!groups.has(groupId)) groups.set(groupId, { max, checkboxes: [] });
+            groups.get(groupId).checkboxes.push(cb);
+        });
+
+        groups.forEach(({ max, checkboxes }) => {
+            checkboxes.forEach(cb => {
+                cb.addEventListener("change", () => {
+                    const checked = checkboxes.filter(c => c.checked).length;
+                    checkboxes.forEach(c => {
+                        if (!c.checked) c.disabled = checked >= max;
+                    });
+                });
+            });
+        });
+
+    });
+
+</script>
+
+</body>
+</html>

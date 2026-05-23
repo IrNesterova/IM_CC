@@ -20,4 +20,35 @@ public class Role {
     private List<RoleChoiceGroup> choiceGroups;
 
 
+    public List<Inventory> getInventoryList() {
+        return inventoryList;
+    }
+
+    public void setInventoryList(List<Inventory> inventoryList) {
+        this.inventoryList = inventoryList;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<RoleChoiceGroup> getChoiceGroups() {
+        return choiceGroups;
+    }
+
+    public void setChoiceGroups(List<RoleChoiceGroup> choiceGroups) {
+        this.choiceGroups = choiceGroups;
+    }
 }
