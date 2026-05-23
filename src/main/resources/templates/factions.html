@@ -3,6 +3,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
@@ -18,10 +19,12 @@
             --bg:#090807;
             --panel:#15120f;
             --gold:#b89b5e;
+            --gold-dark:#6d562f;
             --bone:#e7dcc5;
-            --text:#d0c6b6;
+            --text:#d2c8b8;
             --muted:#988d7c;
-            --line:rgba(184,155,94,0.16);
+            --line:rgba(184,155,94,0.15);
+            --red:#5a1815;
         }
 
         *{
@@ -31,9 +34,12 @@
         }
 
         body{
+
             background:
-                    linear-gradient(rgba(0,0,0,0.84),
-                    rgba(0,0,0,0.94)),
+                    linear-gradient(
+                            rgba(0,0,0,0.88),
+                            rgba(0,0,0,0.96)
+                    ),
                     url("https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2200&auto=format&fit=crop");
 
             background-size:cover;
@@ -54,14 +60,10 @@
             background-image:
                     url("https://www.transparenttextures.com/patterns/dark-leather.png");
 
-            opacity:0.16;
+            opacity:0.14;
 
             pointer-events:none;
         }
-
-        /* ========================= */
-        /* HEADER */
-        /* ========================= */
 
         .header{
             text-align:center;
@@ -70,27 +72,31 @@
         }
 
         .eyebrow{
+
             color:var(--gold);
 
-            letter-spacing:4px;
             text-transform:uppercase;
+
+            letter-spacing:4px;
 
             font-size:13px;
 
-            margin-bottom:20px;
+            margin-bottom:18px;
         }
 
         h1{
+
             font-family:'Cinzel',serif;
 
             font-size:72px;
-            line-height:0.92;
+
+            line-height:0.95;
 
             text-transform:uppercase;
 
             color:var(--bone);
 
-            margin-bottom:22px;
+            margin-bottom:24px;
         }
 
         h1 span{
@@ -98,6 +104,7 @@
         }
 
         .separator{
+
             width:240px;
             height:2px;
 
@@ -113,23 +120,22 @@
         }
 
         .subtitle{
+
             max-width:900px;
 
             margin:auto;
 
             font-size:24px;
+
             line-height:1.7;
 
             color:var(--text);
         }
 
-        /* ========================= */
-        /* MAIN */
-        /* ========================= */
-
         .container{
+
             width:100%;
-            max-width:1600px;
+            max-width:1700px;
 
             margin:auto;
 
@@ -137,90 +143,123 @@
         }
 
         .faction-grid{
+
             display:grid;
 
             grid-template-columns:
-                    repeat(auto-fit,minmax(520px,1fr));
+                    repeat(auto-fit,minmax(700px,1fr));
 
-            gap:34px;
+            gap:36px;
         }
 
         .faction-card{
+
             display:flex;
             flex-direction:column;
 
-            gap:32px;
+            gap:34px;
 
-            padding:36px;
+            padding:42px;
 
             background:
                     linear-gradient(
                             180deg,
                             rgba(28,24,20,0.96),
-                            rgba(12,10,9,0.98)
+                            rgba(10,8,7,0.98)
                     );
 
             border:1px solid var(--line);
 
+            position:relative;
+
+            overflow:hidden;
+
             transition:0.28s ease;
         }
 
+        .faction-card::before{
+
+            content:"";
+
+            position:absolute;
+
+            top:0;
+            left:0;
+
+            width:100%;
+            height:4px;
+
+            background:
+                    linear-gradient(
+                            90deg,
+                            transparent,
+                            var(--gold),
+                            transparent
+                    );
+
+            opacity:0;
+
+            transition:0.3s;
+        }
+
         .faction-card:hover{
+
             transform:translateY(-6px);
 
             border-color:
-                    rgba(184,155,94,0.30);
+                    rgba(184,155,94,0.28);
 
             box-shadow:
-                    0 0 30px rgba(0,0,0,0.45);
+                    0 0 32px rgba(0,0,0,0.45);
+        }
+
+        .faction-card:hover::before{
+            opacity:1;
         }
 
         .faction-name{
+
             font-family:'Cinzel',serif;
 
-            font-size:38px;
+            font-size:42px;
 
             color:var(--gold);
 
             line-height:1.1;
         }
 
-        /* ========================= */
-        /* SECTION */
-        /* ========================= */
-
         .section{
+
             display:flex;
             flex-direction:column;
 
-            gap:18px;
+            gap:16px;
         }
 
         .section-title{
-            color:var(--gold);
 
             font-family:'Cinzel',serif;
 
-            font-size:19px;
-
-            letter-spacing:1px;
+            color:var(--gold);
 
             text-transform:uppercase;
-        }
 
-        .description{
-            color:var(--muted);
-
-            line-height:1.6;
+            letter-spacing:1px;
 
             font-size:18px;
         }
 
-        /* ========================= */
-        /* TAGS */
-        /* ========================= */
+        .description{
+
+            color:var(--muted);
+
+            font-size:18px;
+
+            line-height:1.6;
+        }
 
         .tag-list{
+
             display:flex;
             flex-wrap:wrap;
 
@@ -228,13 +267,14 @@
         }
 
         .tag{
+
             padding:10px 16px;
 
             background:
                     linear-gradient(
                             180deg,
-                            rgba(184,155,94,0.10),
-                            rgba(184,155,94,0.03)
+                            rgba(184,155,94,0.08),
+                            rgba(184,155,94,0.02)
                     );
 
             border:1px solid rgba(184,155,94,0.14);
@@ -244,11 +284,8 @@
             font-size:17px;
         }
 
-        /* ========================= */
-        /* SELECT */
-        /* ========================= */
-
         .faction-select{
+
             width:100%;
 
             padding:14px 18px;
@@ -260,36 +297,34 @@
                             rgba(10,8,7,1)
                     );
 
-            border:1px solid rgba(184,155,94,0.18);
+            border:1px solid rgba(184,155,94,0.16);
 
             color:#e7dcc5;
 
-            font-family:'EB Garamond',serif;
-
             font-size:18px;
+
+            font-family:'EB Garamond',serif;
 
             outline:none;
         }
 
-        /* ========================= */
-        /* SKILLS */
-        /* ========================= */
+        .skill-block{
 
-        .skill-list{
             display:flex;
             flex-direction:column;
 
-            gap:18px;
+            gap:16px;
         }
 
         .skill-row{
+
             display:flex;
-            align-items:center;
             justify-content:space-between;
+            align-items:center;
 
             gap:20px;
 
-            padding:18px 20px;
+            padding:18px;
 
             border:1px solid rgba(184,155,94,0.12);
 
@@ -297,11 +332,12 @@
                     linear-gradient(
                             180deg,
                             rgba(184,155,94,0.05),
-                            rgba(184,155,94,0.02)
+                            rgba(184,155,94,0.01)
                     );
         }
 
         .skill-name{
+
             font-size:22px;
 
             color:var(--bone);
@@ -310,75 +346,127 @@
         }
 
         .advance-controls{
+
             display:flex;
             align-items:center;
 
-            gap:12px;
+            gap:10px;
         }
 
         .advance-btn{
-            width:40px;
-            height:40px;
+
+            width:38px;
+            height:38px;
 
             border:none;
 
             cursor:pointer;
 
-            font-size:24px;
+            font-size:22px;
 
             color:#140f08;
 
             background:
                     linear-gradient(
                             180deg,
-                            #d0b67c 0%,
-                            #947743 100%
+                            #d0b67c,
+                            #947743
                     );
-
-            transition:0.2s ease;
-        }
-
-        .advance-btn:hover{
-            transform:translateY(-2px);
-        }
-
-        .advance-btn:disabled{
-            opacity:0.35;
-
-            cursor:not-allowed;
         }
 
         .advance-input{
+
             width:70px;
 
             text-align:center;
 
-            padding:10px;
+            padding:8px;
 
             background:#0d0b09;
 
-            border:1px solid rgba(184,155,94,0.16);
+            border:1px solid rgba(184,155,94,0.15);
 
             color:#e7dcc5;
 
-            font-size:22px;
+            font-size:20px;
 
             font-family:'Cinzel',serif;
         }
 
         .remaining{
+
             color:var(--gold);
 
-            font-family:'Cinzel',serif;
-
             font-size:24px;
+
+            font-family:'Cinzel',serif;
         }
 
-        /* ========================= */
-        /* BUTTON */
-        /* ========================= */
+        .choice-group{
+
+            display:flex;
+            flex-direction:column;
+
+            gap:16px;
+
+            padding:24px;
+
+            border:1px solid rgba(184,155,94,0.12);
+
+            background:
+                    linear-gradient(
+                            180deg,
+                            rgba(184,155,94,0.03),
+                            rgba(184,155,94,0.01)
+                    );
+        }
+
+        .choice-option{
+
+            display:flex;
+            align-items:flex-start;
+
+            gap:16px;
+
+            padding:18px;
+
+            border:1px solid rgba(184,155,94,0.10);
+
+            background:rgba(0,0,0,0.22);
+
+            transition:0.2s ease;
+        }
+
+        .choice-option:hover{
+
+            border-color:
+                    rgba(184,155,94,0.25);
+        }
+
+        .choice-option input{
+
+            margin-top:4px;
+
+            transform:scale(1.15);
+        }
+
+        .choice-content{
+
+            display:flex;
+            flex-direction:column;
+
+            gap:10px;
+        }
+
+        .reward-line{
+
+            color:var(--bone);
+
+            font-size:18px;
+        }
 
         .select-btn{
+
             width:100%;
 
             margin-top:auto;
@@ -434,8 +522,10 @@
     <div class="separator"></div>
 
     <div class="subtitle">
-        Your faction determines your training,
-        allegiances and place within the Imperium.
+
+        Your faction determines your resources,
+        influence, training and role within the Imperium.
+
     </div>
 
 </section>
@@ -443,8 +533,6 @@
 <div class="container">
 
     <div class="faction-grid">
-
-        <!-- CARD -->
 
         <form class="faction-card"
               th:each="faction : ${allFactions}"
@@ -459,9 +547,6 @@
 
             <div class="faction-name"
                  th:text="${faction.name}">
-
-                Adeptus Arbites
-
             </div>
 
             <!-- CHARACTERISTICS -->
@@ -469,42 +554,31 @@
             <div class="section">
 
                 <div class="section-title">
-                    Characteristics
+                    Characteristic Bonuses
                 </div>
 
-                <!-- PRIMARY -->
+                <div class="tag-list">
 
-                <div th:if="${!#lists.isEmpty(faction.primaryCharacteristics)}">
+                    <div class="tag"
+                         th:each="char : ${faction.primaryCharacteristics}">
 
-                    <div class="description">
-                        You gain +5 to:
-                    </div>
-
-                    <div class="tag-list">
-
-                        <div class="tag"
-                             th:each="char : ${faction.primaryCharacteristics}">
-                            <span th:text="${char.full_name}">
-                            </span>
-
-                        </div>
+                        +5
+                        <span th:text="${char.full_name}"></span>
 
                     </div>
 
                 </div>
 
-                <!-- SECONDARY -->
-
-                <div th:if="${!#lists.isEmpty(faction.secondaryCharacteristics)}"
-                     style="margin-top:18px;">
+                <div th:if="${!#lists.isEmpty(faction.secondaryCharacteristics)}">
 
                     <div class="description">
-                        Choose one additional characteristic
-                        to receive +5:
+
+                        Choose one additional +5 bonus:
+
                     </div>
 
                     <select class="faction-select"
-                            name="selectedCharacteristicId">
+                            name="selectedSecondaryCharacteristicId">
 
                         <option
                                 th:each="char : ${faction.secondaryCharacteristics}"
@@ -518,37 +592,35 @@
 
             </div>
 
-            <!-- SKILL ADVANCES -->
+            <!-- SKILLS -->
 
             <div class="section">
 
                 <div class="section-title">
-                    You have 5 Advances to spend on:
+                    Skill Advances
                 </div>
 
                 <div class="description">
-                    Maximum 2 Advances per skill.
+
+                    You have 5 Advances to distribute.
+                    Maximum 2 per skill.
+
                 </div>
 
-                <div class="skill-list">
+                <div class="skill-block">
 
                     <div class="skill-row"
                          th:each="skill : ${faction.skillList}">
 
                         <div class="skill-name"
                              th:text="${skill.name}">
-
-                            Awareness
-
                         </div>
 
                         <div class="advance-controls">
 
                             <button type="button"
                                     class="advance-btn minus-btn">
-
                                 −
-
                             </button>
 
                             <input type="number"
@@ -560,9 +632,7 @@
 
                             <button type="button"
                                     class="advance-btn plus-btn">
-
                                 +
-
                             </button>
 
                         </div>
@@ -588,8 +658,7 @@
                     Talents
                 </div>
 
-                <div th:if="${#lists.size(faction.talentList) == 1}"
-                     class="tag-list">
+                <div class="tag-list">
 
                     <div class="tag"
                          th:each="talent : ${faction.talentList}"
@@ -598,28 +667,9 @@
 
                 </div>
 
-                <div th:if="${#lists.size(faction.talentList) > 1}">
-
-                    <div class="description">
-                        Choose one talent:
-                    </div>
-
-                    <select class="faction-select"
-                            name="selectedTalentId">
-
-                        <option
-                                th:each="talent : ${faction.talentList}"
-                                th:value="${talent.id}"
-                                th:text="${talent.name}">
-                        </option>
-
-                    </select>
-
-                </div>
-
             </div>
 
-            <!-- EQUIPMENT -->
+            <!-- INVENTORY -->
 
             <div class="section">
 
@@ -633,6 +683,67 @@
                          th:each="item : ${faction.inventoryList}"
                          th:text="${item.name}">
                     </div>
+
+                </div>
+
+            </div>
+
+            <!-- CHOICE GROUPS -->
+
+            <div class="section"
+                 th:if="${!#lists.isEmpty(faction.choiceGroups)}">
+
+                <div class="section-title">
+                    You gain one of the following:
+                </div>
+
+                <div class="choice-group"
+                     th:each="group : ${faction.choiceGroups}">
+
+                    <div class="description">
+
+                        Choose
+                        <span th:text="${group.choicesRequired}">
+                        </span>
+
+                        option(s):
+
+                    </div>
+
+                    <label class="choice-option"
+                           th:each="option : ${group.options}">
+
+                        <input type="radio"
+                               th:name="'choiceGroup_' + ${group.id}"
+                               th:value="${option.id}">
+
+                        <div class="choice-content">
+
+                            <!-- TALENTS -->
+
+                            <div class="reward-line"
+                                 th:each="talent : ${option.talents}">
+
+                                •
+                                <span th:text="${talent.name}">
+                                </span>
+
+                            </div>
+
+                            <!-- INVENTORY -->
+
+                            <div class="reward-line"
+                                 th:each="item : ${option.inventory}">
+
+                                •
+                                <span th:text="${item.name}">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </label>
 
                 </div>
 
@@ -661,7 +772,7 @@
             const inputs =
                 card.querySelectorAll(".advance-input");
 
-            const remainingText =
+            const remainingValue =
                 card.querySelector(".remaining-value");
 
             const maxTotal = 5;
@@ -674,7 +785,7 @@
                     total += parseInt(input.value) || 0;
                 });
 
-                remainingText.textContent =
+                remainingValue.textContent =
                     maxTotal - total;
             }
 
@@ -731,40 +842,6 @@
                     });
 
                 });
-
-            inputs.forEach(input => {
-
-                input.addEventListener("input", () => {
-
-                    let value =
-                        parseInt(input.value) || 0;
-
-                    if(value > 2){
-                        input.value = 2;
-                    }
-
-                    if(value < 0){
-                        input.value = 0;
-                    }
-
-                    let total = 0;
-
-                    inputs.forEach(i => {
-                        total += parseInt(i.value) || 0;
-                    });
-
-                    if(total > maxTotal){
-
-                        input.value =
-                            parseInt(input.value)
-                            - (total - maxTotal);
-                    }
-
-                    updateRemaining();
-
-                });
-
-            });
 
             updateRemaining();
 

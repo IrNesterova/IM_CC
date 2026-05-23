@@ -3,17 +3,16 @@ package portfolio.example.im_cc.models;
 import jakarta.persistence.*;
 
 @Entity
-public class FactionInventoryChoice {
+public class FactionTalentChoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne
     private FactionChoiceGroup factionChoiceGroup;
-
     @ManyToOne
-    private Inventory inventory;
+    private Talent talent;
 
+    private Long option_id;
     public FactionChoiceGroup getFactionChoiceGroup() {
         return factionChoiceGroup;
     }
@@ -30,11 +29,19 @@ public class FactionInventoryChoice {
         this.id = id;
     }
 
-    public Inventory getInventory() {
-        return inventory;
+    public Talent getTalent() {
+        return talent;
     }
 
-    public void setInventory(Inventory inventory) {
-        this.inventory = inventory;
+    public void setTalent(Talent talent) {
+        this.talent = talent;
+    }
+
+    public Long getOption_id() {
+        return option_id;
+    }
+
+    public void setOption_id(Long option_id) {
+        this.option_id = option_id;
     }
 }

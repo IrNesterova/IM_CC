@@ -9,4 +9,6 @@ public interface FactionService {
     List<Faction> getAllFactions();
     List<Faction> getAllFactionsWithAdds();
     Faction getById(Long id);
+    Faction getFactionWithAdds(Long id);
+
 }

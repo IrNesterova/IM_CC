@@ -24,6 +24,8 @@ public class Faction {
 
     @Column(columnDefinition = "text")
     private String influenceDescription;
+
+
     @Transient
     private List<Talent> talentList;
 
@@ -86,5 +88,13 @@ public class Faction {
 
     public void setSecondaryCharacteristics(List<Characteristics> secondaryCharacteristics) {
         this.secondaryCharacteristics = secondaryCharacteristics;
+    }
+
+    public List<FactionChoiceGroup> getChoiceGroups() {
+        return choiceGroups;
+    }
+
+    public void setChoiceGroups(List<FactionChoiceGroup> choiceGroups) {
+        this.choiceGroups = choiceGroups;
     }
 }
