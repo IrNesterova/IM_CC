@@ -120,6 +120,42 @@
             gap: 12px;
         }
 
+        .load-expand {
+            display: none;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .load-expand.open { display: flex; }
+        .load-code-input {
+            flex: 1;
+            padding: 14px 16px;
+            background: transparent;
+            border: 1px solid rgba(5,5,4,0.3);
+            color: #050504;
+            font-family: 'Cinzel', serif;
+            font-size: 15px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .load-code-input:focus { border-color: #085d65; }
+        .load-code-input::placeholder { letter-spacing: 2px; font-size: 12px; color: rgba(5,5,4,0.35); }
+        .btn-go {
+            padding: 14px 20px;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: #085d65;
+            color: #f2f3ed;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn-go:hover { background: #0a7080; }
+
         .btn {
             display: block;
             width: 100%;
@@ -217,7 +253,13 @@
 
         <div class="buttons">
             <a href="/characteristics" class="btn btn-primary">Создать персонажа</a>
-            <a href="#" class="btn btn-secondary">Загрузить персонажа</a>
+            <button class="btn btn-secondary" onclick="toggleLoad()" id="load-toggle-btn">Загрузить персонажа</button>
+            <div class="load-expand" id="load-expand">
+                <input type="text" class="load-code-input" id="load-code-input"
+                       placeholder="Введи код" maxlength="6"
+                       onkeydown="if(event.key==='Enter') doLoad()">
+                <button class="btn-go" onclick="doLoad()">→</button>
+            </div>
         </div>
 
         </div>
@@ -229,5 +271,17 @@
     <span class="footer-right">© Games Workshop Ltd</span>
 </footer>
 
+<script>
+    function toggleLoad() {
+        const exp = document.getElementById('load-expand');
+        const open = exp.classList.toggle('open');
+        if (open) document.getElementById('load-code-input').focus();
+    }
+    function doLoad() {
+        const code = document.getElementById('load-code-input').value.trim().toUpperCase();
+        if (code.length !== 6) { alert('Введи 6-символьный код.'); return; }
+        window.location.href = `/character/restore/${code}`;
+    }
+</script>
 </body>
 </html>

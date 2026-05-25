@@ -1,5 +1,6 @@
 package portfolio.example.im_cc.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -39,7 +40,8 @@ public class SummaryController {
     @GetMapping
     public String getSummary(
             @ModelAttribute("characterCreation") CharacterCreationModel ccm,
-            Model model
+            Model model,
+            HttpSession httpSession
     ) {
         model.addAttribute("sheet", summaryService.build(ccm));
 
@@ -87,6 +89,18 @@ public class SummaryController {
                 actionDescMap.put(a.getName(), a.getDescription() != null ? a.getDescription() : "");
         });
         model.addAttribute("actionDescMap", actionDescMap);
+
+        String pendingEdits = (String) httpSession.getAttribute("pendingSummaryEdits");
+        if (pendingEdits != null) {
+            model.addAttribute("pendingSummaryEdits", pendingEdits);
+            httpSession.removeAttribute("pendingSummaryEdits");
+        }
+
+        String pendingSaveCode = (String) httpSession.getAttribute("pendingSaveCode");
+        if (pendingSaveCode != null) {
+            model.addAttribute("pendingSaveCode", pendingSaveCode);
+            httpSession.removeAttribute("pendingSaveCode");
+        }
 
         return "summary";
     }

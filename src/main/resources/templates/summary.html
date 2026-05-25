@@ -184,7 +184,11 @@
         .action-desc { font-size: 11px; color: var(--muted); line-height: 1.45; }
 
         /* ── Actions bar ── */
-        .page-actions { text-align: center; padding: 18px 0 0; display: flex; gap: 14px; justify-content: center; }
+        .page-actions { text-align: center; padding: 18px 0 0; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; align-items: center; }
+        .save-code-box { font-family: 'Cinzel', serif; font-size: 12px; color: var(--ink); padding: 5px 10px; border: 1px solid var(--line-strong); background: rgba(8,93,101,0.05); letter-spacing: 2px; }
+        .save-code-box strong { color: var(--red); font-size: 14px; letter-spacing: 3px; }
+        .load-group { display: flex; gap: 5px; align-items: center; }
+        #load-code-input { width: 90px; text-transform: uppercase; letter-spacing: 2px; text-align: center; font-family: 'Cinzel', serif; }
 
         /* ── Print ── */
         @media print {
@@ -335,7 +339,7 @@
     <div class="sec-block">
         <div class="sec-hdr">Influence</div>
         <div class="sec-body">
-            <table class="infl-table">
+            <table class="infl-table" id="infl-table">
                 <tr>
                     <th class="infl-col-faction">Faction</th>
                     <th class="infl-col-infl">Infl</th>
@@ -528,7 +532,7 @@
     <div class="sec-block">
         <div class="sec-hdr">Melee Weapons</div>
         <div class="sec-body">
-            <table class="data-table">
+            <table class="data-table" id="melee-table">
                 <tr>
                     <th style="width:140px;">Name</th>
                     <th style="width:70px;">Class</th>
@@ -550,7 +554,7 @@
     <div class="sec-block">
         <div class="sec-hdr">Ranged Weapons</div>
         <div class="sec-body">
-            <table class="data-table">
+            <table class="data-table" id="ranged-table">
                 <tr>
                     <th style="width:110px;">Name</th>
                     <th style="width:60px;">Type</th>
@@ -578,7 +582,7 @@
     <div class="sec-block">
         <div class="sec-hdr">Shield</div>
         <div class="sec-body">
-            <table class="data-table">
+            <table class="data-table" id="shield-table">
                 <tr>
                     <th style="width:140px;">Name</th>
                     <th style="width:38px;">AP</th>
@@ -599,7 +603,7 @@
     <div class="two-col-panels">
         <div class="panel-half">
             <div class="panel-title">Protection</div>
-            <table class="data-table">
+            <table class="data-table" id="protection-table">
                 <tr><th style="width:90px;">Location</th><th style="width:38px;">AP</th><th>Special</th><th style="width:30px;">WT</th></tr>
                 <tr><td class="loc">Head</td>     <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
                 <tr><td class="loc">Body</td>     <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
@@ -611,7 +615,7 @@
         </div>
         <div class="panel-half">
             <div class="panel-title">Critical Wounds</div>
-            <table class="data-table">
+            <table class="data-table" id="crit-table">
                 <tr><th style="width:90px;">Location</th><th>Effect / Notes</th><th style="width:38px;">Value</th></tr>
                 <tr th:each="i : ${#numbers.sequence(1, 6)}">
                     <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>
@@ -699,11 +703,23 @@
 
 
 <div class="page-actions">
+    <button class="submit-btn" onclick="saveCharacter()">Save Character</button>
+    <div id="save-code-display" class="save-code-box" style="display:none;">
+        Saved — Code: <strong id="save-code-val"></strong>
+    </div>
+    <div class="load-group">
+        <input type="text" class="add-input" id="load-code-input" placeholder="Code…" maxlength="6">
+        <button class="submit-btn" onclick="loadCharacter()">Load</button>
+    </div>
     <button class="submit-btn" onclick="window.print()">Print / Save PDF</button>
     <a href="/" class="btn-secondary">New Character</a>
 </div>
 
 </div><!-- /sheet-wrapper -->
+
+<script type="application/json" id="pending-edits-data"
+        th:if="${pendingSummaryEdits != null}"
+        th:utext="${pendingSummaryEdits}"></script>
 
 <script th:inline="javascript">
 /*<![CDATA[*/
@@ -714,6 +730,7 @@ const allMutationNames  = /*[[${allMutationNames}]]*/ [];
 const mutationDescMap   = /*[[${mutationDescMap}]]*/ {};
 const allActionNames    = /*[[${allActionNames}]]*/ [];
 const actionDescMap     = /*[[${actionDescMap}]]*/ {};
+const pendingSaveCode   = /*[[${pendingSaveCode}]]*/ null;
 const CHAR_S   = 'STR';
 const CHAR_T   = 'TGH';
 const CHAR_AG  = 'AG';
@@ -905,6 +922,200 @@ const CHAR_WP  = 'WIL';
         const desc = talentDescMap[name];
         if (desc) span.closest('.sm-tag').dataset.desc = desc;
     });
+
+    // ── Save / Load ──────────────────────────────────────────────────
+
+    function collectTableInputs(tableId) {
+        const t = document.getElementById(tableId);
+        if (!t) return [];
+        return [...t.querySelectorAll('tr')].slice(1).map(row =>
+            [...row.querySelectorAll('input')].map(i => i.value)
+        );
+    }
+
+    function restoreTableInputs(tableId, data) {
+        if (!data) return;
+        const t = document.getElementById(tableId);
+        if (!t) return;
+        const rows = [...t.querySelectorAll('tr')].slice(1);
+        data.forEach((rowData, ri) => {
+            if (!rows[ri]) return;
+            const inputs = [...rows[ri].querySelectorAll('input')];
+            rowData.forEach((v, ci) => { if (inputs[ci]) inputs[ci].value = v; });
+        });
+    }
+
+    function collectState() {
+        const charStart = {};
+        document.querySelectorAll('.char-start-input').forEach(i => { charStart[i.dataset.char] = i.value; });
+        const charAdv = {};
+        document.querySelectorAll('.char-adv-input').forEach(i => { charAdv[i.dataset.char] = i.value; });
+
+        const skillAdv = {};
+        document.querySelectorAll('.skill-row').forEach(row => {
+            const nm = row.querySelector('.sk-name')?.textContent.trim();
+            if (nm) skillAdv[nm] = row.querySelector('.sk-adv')?.value || '0';
+        });
+        const specAdv = {};
+        document.querySelectorAll('.spec-row').forEach(row => {
+            const nm = row.querySelector('.spec-name')?.textContent.trim();
+            if (nm) specAdv[nm] = row.querySelector('.sp-adv')?.value || '0';
+        });
+
+        const inflRows = [];
+        [...document.querySelectorAll('#infl-table tr')].slice(1).forEach(row =>
+            inflRows.push([...row.querySelectorAll('input')].map(i => i.value))
+        );
+
+        return {
+            name:        document.getElementById('id-name')?.value || '',
+            charStart, charAdv,
+            augmentics:  document.getElementById('augmentics')?.value || '',
+            fateTotal:   document.querySelector('.fate-threshold')?.textContent || '3',
+            fateCur:     document.getElementById('id-fate-cur')?.value || '0',
+            critTotal:   document.getElementById('crit-total')?.value || '0',
+            handedness:  document.getElementById('handedness')?.value || 'right',
+            corruption:  document.getElementById('corruption-val')?.value || '0',
+            woundsCur:   document.getElementById('wounds-cur')?.value || '0',
+            inflRows,
+            skillAdv, specAdv,
+            talents:     [...document.querySelectorAll('#talentCloud .tag-text')].map(el => el.textContent.trim()),
+            mutations:   [...document.querySelectorAll('#mutCloud .tag-text')].map(el => el.textContent.trim()),
+            superiority: document.getElementById('superiority')?.value || '0',
+            melee:       collectTableInputs('melee-table'),
+            ranged:      collectTableInputs('ranged-table'),
+            shield:      collectTableInputs('shield-table'),
+            protection:  collectTableInputs('protection-table'),
+            critWounds:  collectTableInputs('crit-table'),
+            injuryNotes: document.getElementById('injury-notes')?.value || '',
+            equipment:   [...document.querySelectorAll('#equipCloud .tag-text')].map(el => el.textContent.trim()),
+            appearance:  [...document.querySelectorAll('.appear-input')].map(i => i.value),
+            divination:  document.getElementById('field-divination')?.value || '',
+            shortGoal:   document.getElementById('field-short-goal')?.value || '',
+            longGoal:    document.getElementById('field-long-goal')?.value || '',
+            biography:   document.getElementById('biography')?.value || '',
+        };
+    }
+
+    function restoreState(state) {
+        const setVal = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v; };
+
+        setVal('id-name', state.name);
+
+        Object.entries(state.charStart || {}).forEach(([c, v]) => {
+            const el = document.querySelector(`.char-start-input[data-char="${c}"]`);
+            if (el) el.value = v;
+        });
+        Object.entries(state.charAdv || {}).forEach(([c, v]) => {
+            const el = document.querySelector(`.char-adv-input[data-char="${c}"]`);
+            if (el) el.value = v;
+        });
+
+        setVal('augmentics', state.augmentics);
+
+        const fateThresh = document.querySelector('.fate-threshold');
+        if (fateThresh) fateThresh.textContent = state.fateTotal || '3';
+        const fateCurEl = document.getElementById('id-fate-cur');
+        if (fateCurEl) { fateCurEl.max = state.fateTotal || '9'; fateCurEl.value = state.fateCur || '0'; }
+
+        setVal('crit-total',    state.critTotal);
+        const handEl = document.getElementById('handedness');
+        if (handEl && state.handedness) handEl.value = state.handedness;
+        setVal('corruption-val', state.corruption);
+        const wCurEl = document.getElementById('wounds-cur');
+        if (wCurEl) { wCurEl.value = state.woundsCur || '0'; wCurEl._touched = true; }
+
+        const inflRows = [...document.querySelectorAll('#infl-table tr')].slice(1);
+        (state.inflRows || []).forEach((rowData, ri) => {
+            if (!inflRows[ri]) return;
+            const inputs = [...inflRows[ri].querySelectorAll('input')];
+            rowData.forEach((v, ci) => { if (inputs[ci]) inputs[ci].value = v; });
+        });
+
+        Object.entries(state.skillAdv || {}).forEach(([name, v]) => {
+            document.querySelectorAll('.skill-row').forEach(row => {
+                if (row.querySelector('.sk-name')?.textContent.trim() === name) {
+                    const inp = row.querySelector('.sk-adv');
+                    if (inp) inp.value = v;
+                }
+            });
+        });
+        Object.entries(state.specAdv || {}).forEach(([name, v]) => {
+            document.querySelectorAll('.spec-row').forEach(row => {
+                if (row.querySelector('.spec-name')?.textContent.trim() === name) {
+                    const inp = row.querySelector('.sp-adv');
+                    if (inp) inp.value = v;
+                }
+            });
+        });
+
+        const talentCloud = document.getElementById('talentCloud');
+        if (talentCloud) {
+            talentCloud.innerHTML = '';
+            (state.talents || []).forEach(t => talentCloud.appendChild(createTag(t, talentDescMap[t] || '')));
+        }
+        const mutCloud = document.getElementById('mutCloud');
+        if (mutCloud) {
+            mutCloud.innerHTML = '';
+            (state.mutations || []).forEach(m => mutCloud.appendChild(createTag(m, mutationDescMap[m] || '')));
+        }
+
+        setVal('superiority', state.superiority);
+        restoreTableInputs('melee-table',       state.melee);
+        restoreTableInputs('ranged-table',       state.ranged);
+        restoreTableInputs('shield-table',       state.shield);
+        restoreTableInputs('protection-table',   state.protection);
+        restoreTableInputs('crit-table',         state.critWounds);
+        setVal('injury-notes', state.injuryNotes);
+
+        const equipCloud = document.getElementById('equipCloud');
+        if (equipCloud) {
+            equipCloud.innerHTML = '';
+            (state.equipment || []).forEach(item => equipCloud.appendChild(createTag(item, '')));
+        }
+
+        const appearInputs = [...document.querySelectorAll('.appear-input')];
+        (state.appearance || []).forEach((v, i) => { if (appearInputs[i]) appearInputs[i].value = v; });
+
+        setVal('field-divination', state.divination);
+        setVal('field-short-goal', state.shortGoal);
+        setVal('field-long-goal',  state.longGoal);
+        setVal('biography',        state.biography);
+
+        updateAllTotals();
+    }
+
+    async function saveCharacter() {
+        const body = JSON.stringify(collectState());
+        try {
+            const resp = await fetch('/character/save', { method: 'POST', headers: {'Content-Type':'text/plain'}, body });
+            if (!resp.ok) throw new Error(resp.status);
+            const json = await resp.json();
+            showSaveCode(json.code);
+        } catch (e) {
+            alert('Save failed. Please try again.');
+        }
+    }
+
+    function loadCharacter() {
+        const code = document.getElementById('load-code-input')?.value.trim().toUpperCase();
+        if (!code || code.length !== 6) { alert('Enter a 6-character save code.'); return; }
+        window.location.href = `/character/restore/${code}`;
+    }
+
+    // Auto-apply edits injected by server after /character/restore/{code}
+    const _pendingEl = document.getElementById('pending-edits-data');
+    if (_pendingEl) {
+        try { restoreState(JSON.parse(_pendingEl.textContent)); }
+        catch(e) { console.error('Could not restore edits:', e); }
+    }
+
+    function showSaveCode(code) {
+        if (!code) return;
+        document.getElementById('save-code-val').textContent = code;
+        document.getElementById('save-code-display').style.display = '';
+    }
+    if (pendingSaveCode) showSaveCode(pendingSaveCode);
 </script>
 
 <footer>
