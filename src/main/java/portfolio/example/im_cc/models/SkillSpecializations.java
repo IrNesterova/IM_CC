@@ -16,6 +16,6 @@ public class SkillSpecializations {
     @JoinColumn
     private Specialization specialization;
 
-
-
+    public Skill getSkill() { return skill; }
+    public Specialization getSpecialization() { return specialization; }
 }

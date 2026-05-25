@@ -9,6 +9,7 @@ import portfolio.example.im_cc.models.Faction;
 import portfolio.example.im_cc.services.CharacteristicsServiceImpl;
 import portfolio.example.im_cc.services.FactionServiceImpl;
 
+import org.springframework.util.MultiValueMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -188,25 +189,42 @@ public class CharacterCreationController {
     @PostMapping("/roles")
     public String saveRoles(
             @ModelAttribute("characterCreation") CharacterCreationModel ccm,
-            @RequestParam Map<String, String> params
+            @RequestParam MultiValueMap<String, String> params
     ) {
-        ccm.setRoleId(Long.valueOf(params.get("roleId")));
+        ccm.setRoleId(Long.valueOf(params.getFirst("roleId")));
 
         Map<Long, List<Long>> roleChoices = new HashMap<>();
+        Map<Long, Integer> skillAdvances = new HashMap<>();
+        Map<Long, Integer> specAdvances = new HashMap<>();
 
         for (String key : params.keySet()) {
             if (key.startsWith("roleChoice_")) {
                 Long groupId = Long.valueOf(key.replace("roleChoice_", ""));
-                String[] values = params.get(key).split(",");
                 List<Long> selected = new ArrayList<>();
-                for (String v : values) {
+                for (String v : params.get(key)) {
                     if (!v.isBlank()) selected.add(Long.valueOf(v.trim()));
                 }
                 roleChoices.put(groupId, selected);
+            } else if (key.startsWith("roleSkillAdv_")) {
+                Long skillId = Long.valueOf(key.replace("roleSkillAdv_", ""));
+                String val = params.getFirst(key);
+                if (val != null && !val.isBlank()) {
+                    int v = Integer.parseInt(val);
+                    if (v > 0) skillAdvances.put(skillId, v);
+                }
+            } else if (key.startsWith("roleSpecAdv_")) {
+                Long specId = Long.valueOf(key.replace("roleSpecAdv_", ""));
+                String val = params.getFirst(key);
+                if (val != null && !val.isBlank()) {
+                    int v = Integer.parseInt(val);
+                    if (v > 0) specAdvances.put(specId, v);
+                }
             }
         }
 
         ccm.setRoleChoices(roleChoices);
+        ccm.setRoleSkillAdvances(skillAdvances);
+        ccm.setRoleSpecAdvances(specAdvances);
 
         return "redirect:/details";
     }

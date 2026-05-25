@@ -27,6 +27,8 @@ public class RoleChoiceGroup {
     private List<Skill> skillOptions;
     @Transient
     private List<Specialization> specializationOptions;
+    @Transient
+    private List<Skill> specsBySkill;
 
     public Long getId() {
         return id;
@@ -90,5 +92,13 @@ public class RoleChoiceGroup {
 
     public void setSpecializationOptions(List<Specialization> specializationOptions) {
         this.specializationOptions = specializationOptions;
+    }
+
+    public List<Skill> getSpecsBySkill() {
+        return specsBySkill;
+    }
+
+    public void setSpecsBySkill(List<Skill> specsBySkill) {
+        this.specsBySkill = specsBySkill;
     }
 }

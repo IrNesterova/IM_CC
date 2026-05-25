@@ -13,6 +13,8 @@ public class CharacterCreationModel {
     private Map<Long, Integer> factionSkillAdvances = new HashMap<>();
     private Map<Long, Long> factionChoices = new HashMap<>();
     private Map<Long, List<Long>> roleChoices = new HashMap<>();
+    private Map<Long, Integer> roleSkillAdvances = new HashMap<>();
+    private Map<Long, Integer> roleSpecAdvances = new HashMap<>();
 
     // Adding Detail
     private String characterName;
@@ -112,4 +114,10 @@ public class CharacterCreationModel {
 
     public String getConnections() { return connections; }
     public void setConnections(String connections) { this.connections = connections; }
+
+    public Map<Long, Integer> getRoleSkillAdvances() { return roleSkillAdvances; }
+    public void setRoleSkillAdvances(Map<Long, Integer> roleSkillAdvances) { this.roleSkillAdvances = roleSkillAdvances; }
+
+    public Map<Long, Integer> getRoleSpecAdvances() { return roleSpecAdvances; }
+    public void setRoleSpecAdvances(Map<Long, Integer> roleSpecAdvances) { this.roleSpecAdvances = roleSpecAdvances; }
 }

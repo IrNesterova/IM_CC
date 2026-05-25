@@ -1,600 +1,232 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Imperium Maledictum</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=EB+Garamond:wght@400;500;700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        :root{
-            --bg:#0a0908;
-            --panel:#14110f;
-            --gold:#b89b5e;
-            --gold-dark:#6f5a31;
-            --bone:#e7dcc5;
-            --red:#6e1c17;
-            --steel:#2a2724;
-            --text:#d8d0c0;
-            --muted:#998f81;
+        body {
+            background-color: #f2f3ed;
+            background-image: url("https://img.magnific.com/free-photo/plain-rough-gray-cement-textured-background_53876-128155.jpg?semt=ais_hybrid&w=740&q=80");
+            color: #050504;
+            font-family: 'EB Garamond', serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
+        /* ── Top bar ── */
+        .topbar {
+            border-bottom: 2px solid #085d65;
+            padding: 14px 48px;
+            display: flex;
+            align-items: baseline;
+            gap: 20px;
         }
 
-        body{
-            background:
-                    linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.88)),
-                    url("https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2000&auto=format&fit=crop");
-
-            background-size:cover;
-            background-position:center;
-            background-attachment:fixed;
-
-            color:var(--text);
-
-            font-family:'EB Garamond',serif;
-
-            overflow-x:hidden;
+        .topbar-game {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #085d65;
         }
 
-        /* ========================= */
-        /* GOTHIC ATMOSPHERE */
-        /* ========================= */
-
-        body::before{
-            content:"";
-
-            position:fixed;
-            inset:0;
-
-            background:
-                    radial-gradient(circle at top, rgba(184,155,94,0.08), transparent 35%),
-                    linear-gradient(rgba(20,10,10,0.15), rgba(0,0,0,0.6));
-
-            pointer-events:none;
+        .topbar-divider {
+            width: 1px;
+            height: 14px;
+            background: rgba(8,93,101,0.3);
+            align-self: center;
         }
 
-        .noise{
-            position:fixed;
-            inset:0;
-
-            background-image:url("https://www.transparenttextures.com/patterns/dark-leather.png");
-
-            opacity:0.2;
-            pointer-events:none;
+        .topbar-sub {
+            font-family: 'EB Garamond', serif;
+            font-size: 14px;
+            color: rgba(5,5,4,0.45);
+            font-style: italic;
         }
 
-        /* ========================= */
-        /* HERO */
-        /* ========================= */
-
-        .hero{
-            min-height:100vh;
-
-            display:flex;
-            align-items:center;
-            justify-content:center;
-
-            padding:60px 40px;
+        /* ── Main ── */
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 48px;
         }
 
-        .hero-inner{
-            width:100%;
-            max-width:1400px;
-
-            display:grid;
-            grid-template-columns:1.1fr 0.9fr;
-
-            gap:70px;
-            align-items:center;
+        .center {
+            max-width: 580px;
+            width: 100%;
         }
 
-        /* ========================= */
-        /* LEFT SIDE */
-        /* ========================= */
-
-        .eyebrow{
-            color:var(--gold);
-
-            text-transform:uppercase;
-            letter-spacing:4px;
-
-            font-size:13px;
-
-            margin-bottom:20px;
-
-            opacity:0.85;
+        .index-card {
+            background: rgba(247,248,242,0.94);
+            border: 1px solid rgba(8,93,101,0.18);
+            padding: 48px 52px;
+            box-shadow: 0 4px 28px rgba(5,5,4,0.1);
         }
 
-        .title{
-            font-family:'Cinzel',serif;
-
-            font-size:92px;
-            line-height:0.92;
-
-            text-transform:uppercase;
-
-            margin-bottom:28px;
-
-            color:var(--bone);
-
-            text-shadow:
-                    0 0 12px rgba(0,0,0,0.6),
-                    0 0 28px rgba(184,155,94,0.15);
+        /* ── Logo ── */
+        .logo {
+            margin-bottom: 40px;
         }
 
-        .title span{
-            color:var(--gold);
+        .logo-line {
+            height: 1px;
+            background: #085d65;
+            margin-bottom: 20px;
         }
 
-        .subtitle{
-            max-width:650px;
-
-            font-size:24px;
-            line-height:1.7;
-
-            color:var(--text);
-
-            margin-bottom:45px;
+        .logo-title {
+            font-family: 'Cinzel', serif;
+            font-size: 64px;
+            line-height: 0.88;
+            text-transform: uppercase;
+            color: #085d65;
+            letter-spacing: -1px;
         }
 
-        /* ========================= */
-        /* BUTTONS */
-        /* ========================= */
-
-        .buttons{
-            display:flex;
-            gap:20px;
-            flex-wrap:wrap;
+        .logo-title .small {
+            font-size: 34px;
+            font-weight: 400;
+            letter-spacing: 6px;
+            color: rgba(8,93,101,0.6);
+            display: block;
+            margin-top: 4px;
         }
 
-        .btn{
-            position:relative;
-
-            padding:18px 34px;
-
-            text-decoration:none;
-
-            font-size:17px;
-            font-weight:700;
-            letter-spacing:1px;
-
-            transition:0.25s ease;
-
-            border:1px solid var(--gold-dark);
-
-            font-family:'Cinzel',serif;
+        .logo-line-bottom {
+            height: 1px;
+            background: rgba(8,93,101,0.25);
+            margin-top: 20px;
         }
 
-        .btn-primary{
-            background:
-                    linear-gradient(
-                            180deg,
-                            #d1b67b 0%,
-                            #8f7341 100%
-                    );
-
-            color:#130f08;
-
-            box-shadow:
-                    inset 0 1px 0 rgba(255,255,255,0.25),
-                    0 0 20px rgba(0,0,0,0.4);
+        /* ── Description ── */
+        .description {
+            font-size: 19px;
+            line-height: 1.72;
+            color: rgba(5,5,4,0.7);
+            margin-bottom: 44px;
         }
 
-        .btn-primary:hover{
-            transform:translateY(-4px);
-
-            background:
-                    linear-gradient(
-                            180deg,
-                            #e0c58a 0%,
-                            #9f7f46 100%
-                    );
+        /* ── Buttons ── */
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .btn-secondary{
-            background:
-                    linear-gradient(
-                            180deg,
-                            rgba(50,45,40,0.9),
-                            rgba(20,18,16,0.95)
-                    );
-
-            color:var(--bone);
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 17px 28px;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: 0.18s ease;
         }
 
-        .btn-secondary:hover{
-            transform:translateY(-4px);
-
-            border-color:var(--gold);
+        .btn-primary {
+            background: #085d65;
+            color: #f2f3ed;
         }
 
-        /* ========================= */
-        /* RIGHT PANEL */
-        /* ========================= */
-
-        .panel{
-            position:relative;
-
-            background:
-                    linear-gradient(
-                            180deg,
-                            rgba(26,22,18,0.95),
-                            rgba(10,8,7,0.98)
-                    );
-
-            border:1px solid rgba(184,155,94,0.25);
-
-            padding:18px;
-
-            box-shadow:
-                    0 0 40px rgba(0,0,0,0.7),
-                    inset 0 0 40px rgba(184,155,94,0.03);
+        .btn-primary:hover {
+            background: #0a7080;
         }
 
-        .panel::before{
-            content:"";
-
-            position:absolute;
-            inset:10px;
-
-            border:1px solid rgba(184,155,94,0.12);
-
-            pointer-events:none;
+        .btn-secondary {
+            background: transparent;
+            color: #050504;
+            border: 1px solid rgba(5,5,4,0.3);
         }
 
-        .panel-image{
-            position:relative;
-
-            aspect-ratio:4/5;
-
-            overflow:hidden;
+        .btn-secondary:hover {
+            border-color: #085d65;
+            color: #085d65;
         }
 
-        .panel-image img{
-            width:100%;
-            height:100%;
-
-            object-fit:cover;
-
-            filter:
-                    brightness(0.55)
-                    contrast(1.15)
-                    saturate(0.9);
+        /* ── Footer ── */
+        footer {
+            border-top: 1px solid rgba(5,5,4,0.1);
+            padding: 18px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .panel-overlay{
-            position:absolute;
-            inset:0;
-
-            background:
-                    linear-gradient(to top, rgba(0,0,0,0.9), transparent 50%),
-                    linear-gradient(to bottom, rgba(120,30,20,0.15), transparent 25%);
+        .footer-left {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(5,5,4,0.35);
         }
 
-        .panel-content{
-            position:absolute;
-
-            left:35px;
-            bottom:35px;
-            right:35px;
+        .footer-right {
+            font-size: 13px;
+            color: rgba(5,5,4,0.35);
+            font-style: italic;
         }
 
-        .panel-content h3{
-            font-family:'Cinzel',serif;
-
-            font-size:36px;
-
-            color:var(--gold);
-
-            margin-bottom:14px;
+        @media (max-width: 600px) {
+            .topbar { padding: 12px 24px; }
+            main { padding: 44px 24px; }
+            .logo-title { font-size: 46px; }
+            .logo-title .small { font-size: 24px; }
+            footer { padding: 16px 24px; flex-direction: column; gap: 6px; text-align: center; }
         }
-
-        .panel-content p{
-            font-size:20px;
-            line-height:1.6;
-
-            color:#d8d0c0;
-        }
-
-        /* ========================= */
-        /* FEATURES */
-        /* ========================= */
-
-        .features{
-            padding:120px 40px;
-        }
-
-        .features-inner{
-            max-width:1400px;
-            margin:auto;
-        }
-
-        .section-title{
-            text-align:center;
-
-            margin-bottom:70px;
-        }
-
-        .section-title h2{
-            font-family:'Cinzel',serif;
-
-            font-size:54px;
-
-            color:var(--gold);
-
-            margin-bottom:20px;
-        }
-
-        .section-title p{
-            max-width:760px;
-
-            margin:auto;
-
-            font-size:22px;
-            line-height:1.7;
-
-            color:var(--text);
-        }
-
-        .grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-            gap:28px;
-        }
-
-        .feature{
-            position:relative;
-
-            background:
-                    linear-gradient(
-                            180deg,
-                            rgba(28,24,20,0.95),
-                            rgba(14,12,10,0.98)
-                    );
-
-            border:1px solid rgba(184,155,94,0.16);
-
-            padding:34px;
-
-            transition:0.25s ease;
-
-            overflow:hidden;
-        }
-
-        .feature::before{
-            content:"";
-
-            position:absolute;
-            top:0;
-            left:0;
-
-            width:100%;
-            height:4px;
-
-            background:
-                    linear-gradient(
-                            90deg,
-                            transparent,
-                            var(--gold),
-                            transparent
-                    );
-
-            opacity:0;
-            transition:0.3s;
-        }
-
-        .feature:hover{
-            transform:translateY(-6px);
-
-            border-color:rgba(184,155,94,0.35);
-
-            box-shadow:
-                    0 0 28px rgba(0,0,0,0.45);
-        }
-
-        .feature:hover::before{
-            opacity:1;
-        }
-
-        .feature h3{
-            font-family:'Cinzel',serif;
-
-            color:var(--gold);
-
-            font-size:28px;
-
-            margin-bottom:18px;
-        }
-
-        .feature p{
-            font-size:20px;
-            line-height:1.7;
-
-            color:#c5bcab;
-        }
-
-        /* ========================= */
-        /* ORNAMENTS */
-        /* ========================= */
-
-        .separator{
-            width:220px;
-            height:2px;
-
-            margin:30px 0;
-
-            background:
-                    linear-gradient(
-                            90deg,
-                            transparent,
-                            var(--gold),
-                            transparent
-                    );
-        }
-
-        /* ========================= */
-        /* FOOTER */
-        /* ========================= */
-
-        footer{
-            padding:36px;
-
-            border-top:1px solid rgba(184,155,94,0.12);
-
-            background:rgba(0,0,0,0.45);
-
-            text-align:center;
-
-            color:#877d70;
-
-            font-size:15px;
-
-            letter-spacing:2px;
-        }
-
-        /* ========================= */
-        /* RESPONSIVE */
-        /* ========================= */
-
-        @media (max-width:1050px){
-
-            .hero-inner{
-                grid-template-columns:1fr;
-            }
-
-            .title{
-                font-size:66px;
-            }
-
-            .panel{
-                max-width:620px;
-                width:100%;
-                margin:auto;
-            }
-        }
-
-        @media (max-width:700px){
-
-            .hero{
-                padding:40px 24px;
-            }
-
-            .features{
-                padding:90px 24px;
-            }
-
-            .title{
-                font-size:48px;
-            }
-
-            .subtitle{
-                font-size:20px;
-            }
-
-            .buttons{
-                flex-direction:column;
-            }
-
-            .btn{
-                width:100%;
-                text-align:center;
-            }
-
-            .section-title h2{
-                font-size:40px;
-            }
-
-            .feature p{
-                font-size:18px;
-            }
-        }
-
     </style>
 </head>
 <body>
 
-<div class="noise"></div>
+<div class="topbar">
+    <span class="topbar-game">Warhammer 40,000 Roleplay</span>
+    <div class="topbar-divider"></div>
+    <span class="topbar-sub">Character Creator</span>
+</div>
 
-<section class="hero">
+<main>
+    <div class="center">
+        <div class="index-card">
 
-    <div class="hero-inner">
-
-        <!-- LEFT -->
-
-        <div>
-
-            <div class="eyebrow">
-                WARHAMMER 40,000 ROLEPLAY
+        <div class="logo">
+            <div class="logo-line"></div>
+            <div class="logo-title">
+                Imperium
+                <span class="small">Maledictum</span>
             </div>
-
-            <h1 class="title">
-                IMPERIUM<br>
-                <span>MALEDICTUM</span>
-            </h1>
-
-            <div class="separator"></div>
-
-            <p class="subtitle">
-                В галактике есть только война.
-                Создай своего аколита, агента Инквизиции,
-                ветерана Астра Милитарум или жителя гниющего улья
-                и отправься в мрачные глубины Империума Человечества.
-            </p>
-
-            <div class="buttons">
-
-                <a href="/characteristics" class="btn btn-primary">
-                    СОЗДАТЬ ПЕРСОНАЖА
-                </a>
-
-                <a href="#" class="btn btn-secondary">
-                    ЗАГРУЗИТЬ ЛИСТ
-                </a>
-
-            </div>
-
+            <div class="logo-line-bottom"></div>
         </div>
 
-        <!-- RIGHT -->
+        <p class="description">
+            В галактике есть только война. Создай своего аколита —
+            агента Инквизиции, ветерана Астра Милитарум или жителя
+            гниющего улья — и отправься служить Императору.
+        </p>
 
-        <div class="panel">
-
-            <div class="panel-image">
-
-                <img src="https://images.unsplash.com/photo-1508179522353-11ba468c4a1c?q=80&w=1400&auto=format&fit=crop" alt="Imperium">
-
-                <div class="panel-overlay"></div>
-
-                <div class="panel-content">
-
-                    <h3>Сектор Махариус</h3>
-
-                    <p>
-                        Ересь процветает во тьме.
-                        Императору нужны верные слуги.
-                    </p>
-
-                </div>
-
-            </div>
-
+        <div class="buttons">
+            <a href="/characteristics" class="btn btn-primary">Создать персонажа</a>
+            <a href="#" class="btn btn-secondary">Загрузить персонажа</a>
         </div>
 
+        </div>
     </div>
-
-</section>
-
+</main>
 
 <footer>
-    IMPERIUM MALEDICTUM • IN THE GRIM DARKNESS OF THE FAR FUTURE
+    <span class="footer-left">Imperium Maledictum</span>
+    <span class="footer-right">© Games Workshop Ltd</span>
 </footer>
 
 </body>

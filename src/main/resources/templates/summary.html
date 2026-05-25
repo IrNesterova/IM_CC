@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${sheet.characterName != null ? sheet.characterName + ' — Character Sheet' : 'Character Sheet'}">Character Sheet</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        /* ── Layout ── */
+        .sheet-wrapper { max-width: 960px; margin: 0 auto; padding: 24px 16px 60px; display: flex; flex-direction: column; gap: 20px; }
+        .sheet-page { background: var(--panel); border: 1px solid var(--line); padding: 0; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 2px 12px var(--shadow); }
+
+        /* ── Section block ── */
+        .sec-block { border-top: 1px solid var(--line); position: relative; }
+        .sec-block::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--red), transparent); }
+        .sheet-page > .sec-block:first-child,
+        .sheet-page > div:first-child { border-top: none; }
+        .sheet-page > div:first-child::before { display: none; }
+        .sec-hdr { font-family: 'Cinzel', serif; font-size: 9px; color: var(--ink); text-transform: uppercase; letter-spacing: 3px; padding: 4px 12px; display: flex; align-items: center; gap: 8px; }
+        .sec-hdr::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+        .sec-body { padding: 7px 12px 9px; }
+
+        /* ── Shared label / input ── */
+        .id-label { font-family: 'Cinzel', serif; font-size: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 3px; }
+        .id-value { font-size: 13px; color: var(--text); }
+        .field-label { font-family: 'Cinzel', serif; font-size: 7px; color: var(--red-mid); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2px; }
+        .field-input { background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 12px; width: 100%; outline: none; font-family: inherit; padding: 1px 0; }
+        .field-input:focus { border-bottom-color: var(--red); }
+        .field-textarea { background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 12px; line-height: 1.5; width: 100%; outline: none; font-family: inherit; resize: vertical; padding: 5px 7px; min-height: 72px; box-sizing: border-box; }
+        .field-textarea:focus { border-color: var(--red); }
+
+        /* ── Name banner ── */
+        .name-banner { padding: 10px 14px 8px; border-bottom: 1px solid var(--line); }
+        .name-input { background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--ink); font-family: 'Cinzel', serif; font-size: 22px; width: 100%; padding: 2px 0; outline: none; }
+        .name-input:focus { border-bottom-color: var(--red); }
+
+        /* ── Identity 2×2 ── */
+        .identity-grid { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--line); }
+        .id-cell { padding: 6px 12px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(8,93,101,0.02); }
+        .id-cell:nth-child(even) { border-right: none; }
+        .id-cell:nth-last-child(-n+2) { border-bottom: none; }
+
+        /* ── Characteristics ── */
+        .char-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .char-table th, .char-table td { text-align: center; padding: 3px 2px; border: 1px solid var(--border); vertical-align: middle; }
+        .char-table th { font-family: 'Cinzel', serif; font-size: 9px; color: var(--ink); text-transform: uppercase; letter-spacing: 1px; background: rgba(8,93,101,0.05); font-weight: normal; }
+        .char-row-label { font-family: 'Cinzel', serif; font-size: 7px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; text-align: left !important; padding-left: 6px !important; width: 62px; white-space: nowrap; background: rgba(8,93,101,0.02); }
+        .char-start-input { font-size: 13px; color: var(--text); background: transparent; border: none; border-bottom: 1px solid transparent; width: 34px; text-align: center; outline: none; padding: 1px 0; -moz-appearance: textfield; }
+        .char-start-input::-webkit-outer-spin-button, .char-start-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .char-start-input:focus { border-bottom-color: var(--red); }
+        .char-adv-input { font-size: 11px; color: var(--ink); background: transparent; border: 1px solid var(--border); width: 26px; text-align: center; outline: none; padding: 1px 0; -moz-appearance: textfield; }
+        .char-adv-input::-webkit-outer-spin-button, .char-adv-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .char-adv-input:focus { border-color: var(--red); }
+        .char-cur { font-family: 'Cinzel', serif; font-size: 14px; color: var(--ink); }
+
+        /* ── Core stats strip ── */
+        .quick-stats { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; }
+        .qs-cell { padding: 7px 10px; border-right: 1px solid var(--line); background: rgba(8,93,101,0.01); }
+        .qs-cell:last-child { border-right: none; }
+        .qs-val { font-family: 'Cinzel', serif; font-size: 18px; color: var(--ink); }
+        .qs-num { font-family: 'Cinzel', serif; font-size: 18px; color: var(--ink); background: transparent; border: none; border-bottom: 1px solid var(--border); width: 44px; text-align: center; outline: none; -moz-appearance: textfield; }
+        .qs-num::-webkit-outer-spin-button, .qs-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .qs-num:focus { border-bottom-color: var(--red); }
+        .qs-input { background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 12px; width: 100%; outline: none; font-family: inherit; padding: 1px 0; }
+        .qs-input:focus { border-bottom-color: var(--red); }
+        .qs-select { background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-size: 12px; outline: none; font-family: 'Cinzel', serif; padding: 1px 0; width: 100%; cursor: pointer; }
+        .fate-stack, .wounds-stack { display: flex; flex-direction: column; gap: 2px; margin-top: 2px; }
+        .fate-line { display: flex; align-items: baseline; gap: 5px; }
+        .fate-ll { font-family: 'Cinzel', serif; font-size: 7px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; min-width: 40px; }
+        .fate-threshold { font-family: 'Cinzel', serif; font-size: 15px; color: var(--ink); }
+        .fate-num-input { font-family: 'Cinzel', serif; font-size: 15px; color: var(--ink); background: transparent; border: none; border-bottom: 1px solid var(--border); width: 24px; text-align: center; outline: none; -moz-appearance: textfield; }
+        .fate-num-input::-webkit-outer-spin-button, .fate-num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .fate-num-input:focus { border-bottom-color: var(--red); }
+
+        /* ── Influence table ── */
+        .infl-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .infl-col-faction { width: 45%; }
+        .infl-col-infl    { width: 44px; }
+        .infl-col-notes   { width: auto; }
+        .infl-table th { font-family: 'Cinzel', serif; font-size: 8px; color: var(--ink); text-transform: uppercase; letter-spacing: 1px; padding: 3px 6px; border: 1px solid var(--border); background: rgba(8,93,101,0.05); font-weight: normal; text-align: left; }
+        .infl-table td { border: 1px solid var(--border); padding: 2px 6px; }
+        .infl-input { background: transparent; border: none; color: var(--text); font-size: 12px; width: 100%; outline: none; font-family: inherit; padding: 1px 4px; }
+
+        /* ── Skills 2-col ── */
+        .main-2col { display: grid; grid-template-columns: 1fr 1fr; }
+        .skill-col-1 { grid-column: 1; grid-row: 1; border-right: 1px solid var(--border); }
+        .skill-col-2 { grid-column: 2; grid-row: 1; }
+        .col-hdr { display: flex; align-items: center; padding: 2px 4px 2px 3px; border-bottom: 1px solid var(--line); background: rgba(8,93,101,0.04); gap: 3px; }
+        .col-hdr-name { font-family: 'Cinzel', serif; font-size: 7px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; flex: 1; padding-left: 19px; }
+        .col-hdr-right { font-family: 'Cinzel', serif; font-size: 7px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-left: auto; padding-right: 2px; }
+        .skill-row { display: flex; align-items: center; padding: 1px 3px; border-bottom: 1px solid var(--border); gap: 3px; }
+        .skill-row:last-child { border-bottom: none; }
+        .sk-char { font-family: 'Cinzel', serif; font-size: 7px; color: var(--red-mid); text-transform: uppercase; min-width: 16px; text-align: center; flex-shrink: 0; }
+        .sk-name { font-size: 11px; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+        .sk-total { font-family: 'Cinzel', serif; font-size: 13px; color: var(--ink); min-width: 28px; text-align: right; flex-shrink: 0; }
+        .spec-row { display: flex; align-items: center; padding: 1px 3px; border-bottom: 1px solid var(--border); gap: 3px; }
+        .spec-row:last-child { border-bottom: none; }
+        .spec-under { padding-left: 20px !important; background: rgba(8,93,101,0.025); }
+        .spec-char { font-family: 'Cinzel', serif; font-size: 7px; color: var(--red-mid); text-transform: uppercase; min-width: 16px; text-align: center; flex-shrink: 0; }
+        .spec-name { font-size: 11px; color: var(--text); font-style: italic; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+        .spec-total { font-family: 'Cinzel', serif; font-size: 12px; color: var(--ink); min-width: 28px; text-align: right; flex-shrink: 0; }
+
+        /* ── Advance controls ── */
+        .adv-ctrl { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }
+        .adv-btn { width: 13px; height: 13px; background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 10px; cursor: pointer; padding: 0; line-height: 1; transition: 0.1s; }
+        .adv-btn:hover { border-color: var(--red); color: var(--red); }
+        .adv-inp { width: 18px; text-align: center; background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 9px; padding: 0; -moz-appearance: textfield; }
+        .adv-inp::-webkit-outer-spin-button, .adv-inp::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .adv-inp:focus { border-color: var(--red); color: var(--ink); }
+
+        /* ── Tags ── */
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; min-height: 16px; }
+        .sm-tag { padding: 3px 7px; background: rgba(8,93,101,0.05); border: 1px solid var(--line-strong); color: var(--ink); font-size: 11px; }
+        .removable-tag { display: inline-flex; align-items: center; gap: 4px; }
+        .tag-remove-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 12px; padding: 0; line-height: 1; }
+        .tag-remove-btn:hover { color: var(--red); }
+        .sm-tag[data-desc]:not([data-desc=""]) { position: relative; cursor: default; }
+        .sm-tag[data-desc]:not([data-desc=""]):hover::after { content: attr(data-desc); position: absolute; top: calc(100% + 4px); left: 0; width: 200px; background: #1b2c2e; color: #dde0da; border: 1px solid rgba(8,93,101,0.4); padding: 7px 10px; font-size: 11px; line-height: 1.5; font-family: 'EB Garamond', serif; z-index: 500; pointer-events: none; white-space: normal; text-align: left; }
+
+        /* ── Autocomplete ── */
+        .autocomplete-wrapper { position: relative; flex: 1; }
+        .autocomplete-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--panel); border: 1px solid var(--line-strong); border-top: none; max-height: 180px; overflow-y: auto; z-index: 200; display: none; box-shadow: 0 4px 12px var(--shadow); }
+        .autocomplete-dropdown.open { display: block; }
+        .ac-item { padding: 5px 8px; font-size: 12px; color: var(--text); cursor: pointer; border-bottom: 1px solid var(--border); }
+        .ac-item:last-child { border-bottom: none; }
+        .ac-item:hover { background: rgba(8,93,101,0.07); color: var(--ink); }
+
+        /* ── Add row ── */
+        .add-row { display: flex; gap: 5px; align-items: center; margin-top: 6px; }
+        .add-input { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 11px; padding: 3px 6px; outline: none; font-family: inherit; }
+        .add-input::placeholder { color: var(--muted); }
+        .add-input:focus { border-color: var(--red); }
+        .add-btn { width: 22px; height: 22px; background: transparent; border: 1px solid var(--border); color: var(--muted); cursor: pointer; font-size: 16px; padding: 0; line-height: 1; }
+        .add-btn:hover { border-color: var(--red); color: var(--red); }
+
+        /* ── Combat stats bar ── */
+        .combat-bar { display: grid; grid-template-columns: 1fr 1fr 1fr 2fr; border-bottom: 1px solid var(--line); }
+        .cb-cell { padding: 8px 12px; border-right: 1px solid var(--line); }
+        .cb-cell:last-child { border-right: none; }
+        .cb-val { font-family: 'Cinzel', serif; font-size: 22px; color: var(--ink); }
+        .cb-input { font-family: 'Cinzel', serif; font-size: 22px; color: var(--ink); background: transparent; border: none; border-bottom: 1px solid var(--border); width: 50px; text-align: center; outline: none; -moz-appearance: textfield; }
+        .cb-input::-webkit-outer-spin-button, .cb-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .cb-input:focus { border-bottom-color: var(--red); }
+        .speed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px 12px; margin-top: 3px; }
+        .speed-cell { display: flex; align-items: baseline; gap: 5px; }
+        .speed-ll { font-family: 'Cinzel', serif; font-size: 7px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; min-width: 38px; }
+        .speed-val { font-family: 'Cinzel', serif; font-size: 14px; color: var(--ink); }
+
+        /* ── Data table ── */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { font-family: 'Cinzel', serif; font-size: 8px; color: var(--ink); text-transform: uppercase; letter-spacing: 1px; padding: 3px 4px; border: 1px solid var(--border); background: rgba(8,93,101,0.05); font-weight: normal; text-align: center; }
+        .data-table td { border: 1px solid var(--border); padding: 0; font-size: 11px; height: 20px; }
+        .data-table td input { background: transparent; border: none; width: 100%; height: 100%; outline: none; font-size: 11px; font-family: inherit; color: var(--text); padding: 2px 4px; box-sizing: border-box; }
+        .data-table td.loc { font-family: 'Cinzel', serif; font-size: 9px; color: var(--muted); padding: 2px 5px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ── Protection + Crit side by side ── */
+        .two-col-panels { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); }
+        .panel-half { padding: 7px 12px 9px; }
+        .panel-half:first-child { border-right: 1px solid var(--line); }
+        .panel-title { font-family: 'Cinzel', serif; font-size: 9px; color: var(--ink); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .panel-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+        /* ── Appearance row ── */
+        .appear-row { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+        .appear-item { flex: 1; min-width: 80px; padding: 5px 10px; border-right: 1px solid var(--line); }
+        .appear-item:last-child { border-right: none; }
+        .appear-item.wide { flex: 2; }
+        .appear-label { font-family: 'Cinzel', serif; font-size: 8px; color: var(--red-mid); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2px; }
+        .appear-input { background: transparent; border: none; border-bottom: 1px solid transparent; color: var(--text); font-size: 12px; width: 100%; outline: none; font-family: inherit; padding: 1px 0; }
+        .appear-input:focus { border-bottom-color: var(--red); }
+
+        /* ── Notes grid (3-col: divination, short goal, long goal) ── */
+        .notes-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid var(--line); }
+        .notes-cell { padding: 7px 12px 9px; border-right: 1px solid var(--line); }
+        .notes-cell:last-child { border-right: none; }
+
+        /* ── Combat action list ── */
+        .action-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+        .action-item { padding: 6px 10px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+        .action-item:nth-child(even) { border-right: none; }
+        .action-item:nth-last-child(-n+2) { border-bottom: none; }
+        .action-item:nth-last-child(1):nth-child(odd) { border-bottom: none; }
+        .action-name { font-family: 'Cinzel', serif; font-size: 10px; color: var(--ink); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .action-desc { font-size: 11px; color: var(--muted); line-height: 1.45; }
+
+        /* ── Actions bar ── */
+        .page-actions { text-align: center; padding: 18px 0 0; display: flex; gap: 14px; justify-content: center; }
+
+        /* ── Print ── */
+        @media print {
+            @page { size: A4 portrait; margin: 7mm; }
+            body { background: white; }
+            .topbar, .page-actions, .footer { display: none !important; }
+            .sheet-wrapper { max-width: none; padding: 0; gap: 4px; margin: 0; }
+            .sheet-page { box-shadow: none; zoom: 0.78; page-break-inside: avoid; }
+            .adv-btn, .add-row, .tag-remove-btn { display: none !important; }
+            .adv-inp { border: none; width: 14px; font-size: 9px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <span class="topbar-game">Warhammer 40,000 Roleplay</span>
+    <div class="topbar-divider"></div>
+    <span class="topbar-sub">Character Creator</span>
+</div>
+
+<div class="sheet-wrapper">
+
+<!-- ══════════════════════════════════════════
+     PAGE 1 — IDENTITY · CHARACTERISTICS · STATS
+     ══════════════════════════════════════════ -->
+<div class="sheet-page">
+
+    <!-- Name -->
+    <div class="name-banner">
+        <div class="id-label">Name</div>
+        <input type="text" class="name-input" id="id-name" th:value="${sheet.characterName ?: ''}">
+    </div>
+
+    <!-- Origin / Role / Faction / Species -->
+    <div class="identity-grid">
+        <div class="id-cell">
+            <div class="id-label">Origin</div>
+            <div class="id-value" th:text="${sheet.originName ?: '—'}"></div>
+        </div>
+        <div class="id-cell">
+            <div class="id-label">Role</div>
+            <div class="id-value" th:text="${sheet.roleName ?: '—'}"></div>
+        </div>
+        <div class="id-cell">
+            <div class="id-label">Faction</div>
+            <div class="id-value" th:text="${sheet.factionName ?: '—'}"></div>
+        </div>
+        <div class="id-cell">
+            <div class="id-label">Species</div>
+            <div class="id-value">Human</div>
+        </div>
+    </div>
+
+    <!-- Characteristics -->
+    <div class="sec-block">
+        <div class="sec-hdr">Characteristics</div>
+        <div style="padding: 0 0 4px;">
+            <table class="char-table">
+                <tr>
+                    <th class="char-row-label"></th>
+                    <th th:each="entry : ${sheet.characteristics}" th:text="${entry.key}"></th>
+                </tr>
+                <tr>
+                    <td class="char-row-label">Starting</td>
+                    <td th:each="entry : ${sheet.characteristics}">
+                        <input type="number" class="char-start-input"
+                               th:value="${entry.value}" th:attr="data-char=${entry.key}" min="1" max="100">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="char-row-label">Advances</td>
+                    <td th:each="entry : ${sheet.characteristics}" style="white-space:nowrap;">
+                        <div class="adv-ctrl" style="justify-content:center;">
+                            <button type="button" class="adv-btn char-adv-minus" th:attr="data-char=${entry.key}">−</button>
+                            <input type="number" class="char-adv-input" min="0" max="99" value="0" th:attr="data-char=${entry.key}">
+                            <button type="button" class="adv-btn char-adv-plus" th:attr="data-char=${entry.key}">+</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="char-row-label">Current</td>
+                    <td class="char-cur" th:each="entry : ${sheet.characteristics}"
+                        th:text="${entry.value}" th:attr="data-char=${entry.key}"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Augmentics · Initiative · Fate · Crit Wounds · Handedness · Corruption · Wounds -->
+    <div class="sec-block">
+        <div class="sec-hdr">Core Statistics</div>
+        <div class="quick-stats">
+            <div class="qs-cell">
+                <div class="id-label">Augmentics</div>
+                <input type="text" class="qs-input" id="augmentics" placeholder="—">
+            </div>
+            <div class="qs-cell">
+                <div class="id-label">Initiative</div>
+                <div class="qs-val" id="initiative-val">—</div>
+            </div>
+            <div class="qs-cell">
+                <div class="id-label">Fate Points</div>
+                <div class="fate-stack">
+                    <div class="fate-line">
+                        <span class="fate-ll">Total</span>
+                        <span class="fate-threshold" th:text="${sheet.fatePoints}">3</span>
+                    </div>
+                    <div class="fate-line">
+                        <span class="fate-ll">Current</span>
+                        <input type="number" class="fate-num-input" id="id-fate-cur" min="0" max="9" th:value="${sheet.fatePoints}">
+                    </div>
+                </div>
+            </div>
+            <div class="qs-cell">
+                <div class="id-label">Critical Wounds</div>
+                <input type="number" class="qs-num" id="crit-total" min="0" max="99" value="0">
+            </div>
+            <div class="qs-cell">
+                <div class="id-label">Handedness</div>
+                <select class="qs-select" id="handedness">
+                    <option value="right">Right</option>
+                    <option value="left">Left</option>
+                    <option value="ambi">Ambidextrous</option>
+                </select>
+            </div>
+            <div class="qs-cell">
+                <div class="id-label">Corruption</div>
+                <input type="number" class="qs-num" id="corruption-val" min="0" max="100" value="0">
+            </div>
+            <div class="qs-cell">
+                <div class="id-label">Wounds</div>
+                <div class="wounds-stack">
+                    <div class="fate-line">
+                        <span class="fate-ll">Max</span>
+                        <span class="fate-threshold" id="wounds-max">—</span>
+                    </div>
+                    <div class="fate-line">
+                        <span class="fate-ll">Current</span>
+                        <input type="number" class="fate-num-input" id="wounds-cur" min="0" max="99">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Influence -->
+    <div class="sec-block">
+        <div class="sec-hdr">Influence</div>
+        <div class="sec-body">
+            <table class="infl-table">
+                <tr>
+                    <th class="infl-col-faction">Faction</th>
+                    <th class="infl-col-infl">Infl</th>
+                    <th class="infl-col-notes">Notes / Contacts</th>
+                </tr>
+                <tr>
+                    <td><input type="text" class="infl-input" th:value="${sheet.factionName ?: ''}"></td>
+                    <td><input type="number" class="infl-input" style="text-align:center;-moz-appearance:textfield;" min="0" max="100" value="0"></td>
+                    <td><input type="text" class="infl-input"></td>
+                </tr>
+                <tr th:each="i : ${#numbers.sequence(1, 2)}">
+                    <td><input type="text" class="infl-input"></td>
+                    <td><input type="number" class="infl-input" style="text-align:center;-moz-appearance:textfield;" min="0" max="100"></td>
+                    <td><input type="text" class="infl-input"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</div><!-- /page 1 -->
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 2 — SKILLS · TALENTS · MUTATIONS
+     ══════════════════════════════════════════ -->
+<div class="sheet-page">
+
+    <!-- Skills & Specializations -->
+    <div class="sec-block" style="border-top:none;">
+        <div class="sec-hdr">Skills &amp; Specializations</div>
+
+        <th:block th:with="skillHalf=${sheet.skills != null ? (sheet.skills.size() + 1) / 2 : 0}">
+        <div class="main-2col">
+
+            <!-- Col 1 -->
+            <div class="skill-col-1">
+                <div class="col-hdr">
+                    <span class="col-hdr-name">Skill</span>
+                    <span class="col-hdr-right">Adv · Total</span>
+                </div>
+                <th:block th:each="skill, s : ${sheet.skills}" th:if="${s.index < skillHalf}">
+                    <div class="skill-row" th:attr="data-char=${skill.characteristicAbbr}">
+                        <span class="sk-char" th:text="${skill.characteristicAbbr}"></span>
+                        <span class="sk-name" th:text="${skill.name}"></span>
+                        <div class="adv-ctrl">
+                            <button type="button" class="adv-btn sk-minus">−</button>
+                            <input type="number" class="adv-inp sk-adv" min="0" max="4" th:value="${skill.advances}">
+                            <button type="button" class="adv-btn sk-plus">+</button>
+                        </div>
+                        <span class="sk-total"></span>
+                    </div>
+                    <div class="spec-row spec-under"
+                         th:each="spec : ${sheet.specializations}"
+                         th:if="${spec.skillName == skill.name}"
+                         th:attr="data-char=${spec.characteristicAbbr}, data-skill-adv=${spec.skillAdvances}">
+                        <span class="spec-char" th:text="${spec.characteristicAbbr}"></span>
+                        <span class="spec-name" th:text="${spec.name}"></span>
+                        <div class="adv-ctrl">
+                            <button type="button" class="adv-btn sp-minus">−</button>
+                            <input type="number" class="adv-inp sp-adv" min="0" max="4" th:value="${spec.advances}">
+                            <button type="button" class="adv-btn sp-plus">+</button>
+                        </div>
+                        <span class="spec-total"></span>
+                    </div>
+                </th:block>
+            </div>
+
+            <!-- Col 2 -->
+            <div class="skill-col-2">
+                <div class="col-hdr">
+                    <span class="col-hdr-name">Skill</span>
+                    <span class="col-hdr-right">Adv · Total</span>
+                </div>
+                <th:block th:each="skill, s : ${sheet.skills}" th:if="${s.index >= skillHalf}">
+                    <div class="skill-row" th:attr="data-char=${skill.characteristicAbbr}">
+                        <span class="sk-char" th:text="${skill.characteristicAbbr}"></span>
+                        <span class="sk-name" th:text="${skill.name}"></span>
+                        <div class="adv-ctrl">
+                            <button type="button" class="adv-btn sk-minus">−</button>
+                            <input type="number" class="adv-inp sk-adv" min="0" max="4" th:value="${skill.advances}">
+                            <button type="button" class="adv-btn sk-plus">+</button>
+                        </div>
+                        <span class="sk-total"></span>
+                    </div>
+                    <div class="spec-row spec-under"
+                         th:each="spec : ${sheet.specializations}"
+                         th:if="${spec.skillName == skill.name}"
+                         th:attr="data-char=${spec.characteristicAbbr}, data-skill-adv=${spec.skillAdvances}">
+                        <span class="spec-char" th:text="${spec.characteristicAbbr}"></span>
+                        <span class="spec-name" th:text="${spec.name}"></span>
+                        <div class="adv-ctrl">
+                            <button type="button" class="adv-btn sp-minus">−</button>
+                            <input type="number" class="adv-inp sp-adv" min="0" max="4" th:value="${spec.advances}">
+                            <button type="button" class="adv-btn sp-plus">+</button>
+                        </div>
+                        <span class="spec-total"></span>
+                    </div>
+                </th:block>
+            </div>
+
+        </div>
+        </th:block>
+    </div>
+
+    <!-- Talents & Traits -->
+    <div class="sec-block">
+        <div class="sec-hdr">Talents &amp; Traits</div>
+        <div class="sec-body">
+            <div class="tag-cloud" id="talentCloud">
+                <span class="sm-tag removable-tag"
+                      th:each="t : ${sheet.talents}"
+                      th:attr="data-desc=${talentDescMap[t]}">
+                    <span class="tag-text" th:text="${t}"></span>
+                    <button type="button" class="tag-remove-btn" onclick="removeTag(this)">×</button>
+                </span>
+            </div>
+            <div class="add-row">
+                <div class="autocomplete-wrapper">
+                    <input type="text" class="add-input" id="talentInput" placeholder="Search talents…" autocomplete="off">
+                    <div class="autocomplete-dropdown" id="talentDropdown"></div>
+                </div>
+                <button type="button" class="add-btn" onclick="addToCloud('talentCloud','talentInput',talentDescMap)">+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Corruption & Mutations -->
+    <div class="sec-block">
+        <div class="sec-hdr">Corruption &amp; Mutations</div>
+        <div class="sec-body">
+            <div class="tag-cloud" id="mutCloud"></div>
+            <div class="add-row">
+                <div class="autocomplete-wrapper">
+                    <input type="text" class="add-input" id="mutInput" placeholder="Search mutations…" autocomplete="off">
+                    <div class="autocomplete-dropdown" id="mutDropdown"></div>
+                </div>
+                <button type="button" class="add-btn" onclick="addToCloud('mutCloud','mutInput',mutationDescMap)">+</button>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /page 2 -->
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 3 — COMBAT
+     ══════════════════════════════════════════ -->
+<div class="sheet-page">
+
+    <!-- Initiative · Dodge · Superiority · Speed -->
+    <div class="sec-hdr" style="border-top:none; padding-top:6px;">Combat</div>
+    <div class="combat-bar">
+        <div class="cb-cell">
+            <div class="id-label">Initiative</div>
+            <div class="cb-val" id="combat-initiative">—</div>
+        </div>
+        <div class="cb-cell">
+            <div class="id-label">Dodge</div>
+            <div class="cb-val" id="combat-dodge">—</div>
+        </div>
+        <div class="cb-cell">
+            <div class="id-label">Superiority</div>
+            <input type="number" class="cb-input" id="superiority" min="0" max="99" value="0">
+        </div>
+        <div class="cb-cell">
+            <div class="id-label">Speed</div>
+            <div class="speed-grid">
+                <div class="speed-cell"><span class="speed-ll">Half</span><span class="speed-val" id="spd-half">—</span></div>
+                <div class="speed-cell"><span class="speed-ll">Full</span><span class="speed-val" id="spd-full">—</span></div>
+                <div class="speed-cell"><span class="speed-ll">Charge</span><span class="speed-val" id="spd-charge">—</span></div>
+                <div class="speed-cell"><span class="speed-ll">Run</span><span class="speed-val" id="spd-run">—</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Combat Actions -->
+    <div class="sec-block">
+        <div class="sec-hdr">Combat Actions</div>
+        <div class="sec-body">
+            <div class="tag-cloud">
+                <span class="sm-tag"
+                      th:each="a : ${allActionNames}"
+                      th:attr="data-desc=${actionDescMap[a]}"
+                      th:text="${a}"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Melee Weapons -->
+    <div class="sec-block">
+        <div class="sec-hdr">Melee Weapons</div>
+        <div class="sec-body">
+            <table class="data-table">
+                <tr>
+                    <th style="width:140px;">Name</th>
+                    <th style="width:70px;">Class</th>
+                    <th style="width:54px;">Dam</th>
+                    <th style="width:38px;">Pen</th>
+                    <th>Special</th>
+                    <th style="width:32px;">WT</th>
+                </tr>
+                <tr th:each="i : ${#numbers.sequence(1, 4)}">
+                    <td><input type="text"></td><td><input type="text"></td>
+                    <td><input type="text"></td><td><input type="text"></td>
+                    <td><input type="text"></td><td><input type="text"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Ranged Weapons -->
+    <div class="sec-block">
+        <div class="sec-hdr">Ranged Weapons</div>
+        <div class="sec-body">
+            <table class="data-table">
+                <tr>
+                    <th style="width:110px;">Name</th>
+                    <th style="width:60px;">Type</th>
+                    <th style="width:44px;">Dam</th>
+                    <th style="width:36px;">Pen</th>
+                    <th style="width:52px;">Range</th>
+                    <th style="width:36px;">RoF</th>
+                    <th style="width:36px;">Clip</th>
+                    <th style="width:36px;">Rld</th>
+                    <th>Special</th>
+                    <th style="width:28px;">WT</th>
+                </tr>
+                <tr th:each="i : ${#numbers.sequence(1, 4)}">
+                    <td><input type="text"></td><td><input type="text"></td>
+                    <td><input type="text"></td><td><input type="text"></td>
+                    <td><input type="text"></td><td><input type="text"></td>
+                    <td><input type="text"></td><td><input type="text"></td>
+                    <td><input type="text"></td><td><input type="text"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Shield -->
+    <div class="sec-block">
+        <div class="sec-hdr">Shield</div>
+        <div class="sec-body">
+            <table class="data-table">
+                <tr>
+                    <th style="width:140px;">Name</th>
+                    <th style="width:38px;">AP</th>
+                    <th>Locations Covered</th>
+                    <th>Special</th>
+                    <th style="width:32px;">WT</th>
+                </tr>
+                <tr>
+                    <td><input type="text"></td><td><input type="text"></td>
+                    <td><input type="text"></td><td><input type="text"></td>
+                    <td><input type="text"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Protection (by location) + Critical Wounds -->
+    <div class="two-col-panels">
+        <div class="panel-half">
+            <div class="panel-title">Protection</div>
+            <table class="data-table">
+                <tr><th style="width:90px;">Location</th><th style="width:38px;">AP</th><th>Special</th><th style="width:30px;">WT</th></tr>
+                <tr><td class="loc">Head</td>     <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td class="loc">Body</td>     <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td class="loc">Left Arm</td> <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td class="loc">Right Arm</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td class="loc">Left Leg</td> <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td class="loc">Right Leg</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+            </table>
+        </div>
+        <div class="panel-half">
+            <div class="panel-title">Critical Wounds</div>
+            <table class="data-table">
+                <tr><th style="width:90px;">Location</th><th>Effect / Notes</th><th style="width:38px;">Value</th></tr>
+                <tr th:each="i : ${#numbers.sequence(1, 6)}">
+                    <td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Injuries -->
+    <div class="sec-block">
+        <div class="sec-hdr">Injuries</div>
+        <div class="sec-body">
+            <textarea class="field-textarea" id="injury-notes" rows="3" placeholder="Current injuries and their effects…"></textarea>
+        </div>
+    </div>
+
+    <!-- Equipment -->
+    <div class="sec-block">
+        <div class="sec-hdr">Equipment</div>
+        <div class="sec-body">
+            <div class="tag-cloud" id="equipCloud">
+                <span class="sm-tag removable-tag" th:each="item : ${sheet.equipment}">
+                    <span class="tag-text" th:text="${item}"></span>
+                    <button type="button" class="tag-remove-btn" onclick="removeTag(this)">×</button>
+                </span>
+            </div>
+            <div class="add-row">
+                <div class="autocomplete-wrapper">
+                    <input type="text" class="add-input" id="equipInput" placeholder="Search equipment…" autocomplete="off">
+                    <div class="autocomplete-dropdown" id="equipDropdown"></div>
+                </div>
+                <button type="button" class="add-btn" onclick="addToCloud('equipCloud','equipInput',null)">+</button>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /page 3 -->
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 4 — NOTES
+     ══════════════════════════════════════════ -->
+<div class="sheet-page">
+
+    <!-- Appearance -->
+    <div class="sec-block" style="border-top:none;">
+        <div class="sec-hdr">Appearance</div>
+        <div class="appear-row">
+            <div class="appear-item"><div class="appear-label">Age</div><input type="text" class="appear-input" th:value="${sheet.age ?: ''}"></div>
+            <div class="appear-item"><div class="appear-label">Height</div><input type="text" class="appear-input" th:value="${sheet.height ?: ''}"></div>
+            <div class="appear-item"><div class="appear-label">Eyes</div><input type="text" class="appear-input" th:value="${sheet.eyeType ?: ''}"></div>
+            <div class="appear-item"><div class="appear-label">Hair Colour</div><input type="text" class="appear-input" th:value="${sheet.hairColor ?: ''}"></div>
+            <div class="appear-item"><div class="appear-label">Hair Style</div><input type="text" class="appear-input" th:value="${sheet.hairStyle ?: ''}"></div>
+            <div class="appear-item wide"><div class="appear-label">Distinguishing Features</div><input type="text" class="appear-input" th:value="${sheet.distinguishingFeatures ?: ''}"></div>
+        </div>
+    </div>
+
+    <!-- Divination · Short Term Goal · Long Term Goal -->
+    <div class="notes-grid">
+        <div class="notes-cell">
+            <div class="field-label">Divination</div>
+            <textarea class="field-textarea" id="field-divination" rows="4" placeholder="Your divination…"></textarea>
+        </div>
+        <div class="notes-cell">
+            <div class="field-label">Short Term Goal</div>
+            <textarea class="field-textarea" id="field-short-goal" rows="4" th:text="${sheet.shortTermGoal ?: ''}"></textarea>
+        </div>
+        <div class="notes-cell">
+            <div class="field-label">Long Term Goal</div>
+            <textarea class="field-textarea" id="field-long-goal" rows="4" th:text="${sheet.longTermGoal ?: ''}"></textarea>
+        </div>
+    </div>
+
+    <!-- Biography -->
+    <div class="sec-block">
+        <div class="sec-hdr">Biography</div>
+        <div class="sec-body">
+            <textarea class="field-textarea" id="biography" rows="12"
+                      placeholder="Character background, history, personality, connections…"
+                      style="min-height: 180px;"></textarea>
+        </div>
+    </div>
+
+</div><!-- /page 4 -->
+
+
+<div class="page-actions">
+    <button class="submit-btn" onclick="window.print()">Print / Save PDF</button>
+    <a href="/" class="btn-secondary">New Character</a>
+</div>
+
+</div><!-- /sheet-wrapper -->
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+const allTalentNames    = /*[[${allTalentNames}]]*/ [];
+const talentDescMap     = /*[[${talentDescMap}]]*/ {};
+const allInventoryNames = /*[[${allInventoryNames}]]*/ [];
+const allMutationNames  = /*[[${allMutationNames}]]*/ [];
+const mutationDescMap   = /*[[${mutationDescMap}]]*/ {};
+const allActionNames    = /*[[${allActionNames}]]*/ [];
+const actionDescMap     = /*[[${actionDescMap}]]*/ {};
+const CHAR_S   = 'STR';
+const CHAR_T   = 'TGH';
+const CHAR_AG  = 'AG';
+const CHAR_PER = 'PER';
+const CHAR_WP  = 'WIL';
+/*]]>*/
+</script>
+
+<script>
+    // ── Characteristics ──────────────────────────────────────────────
+    function charCurVal(abbr) {
+        const el = document.querySelector(`.char-cur[data-char="${abbr}"]`);
+        return el ? (parseInt(el.textContent) || 0) : 0;
+    }
+    function bonus(abbr) { return Math.floor(charCurVal(abbr) / 10); }
+    function getCharCurrentMap() {
+        const m = {};
+        document.querySelectorAll('.char-cur').forEach(el => { m[el.dataset.char] = parseInt(el.textContent) || 0; });
+        return m;
+    }
+    function updateCharCurrent(charAbbr) {
+        const si = document.querySelector(`.char-start-input[data-char="${charAbbr}"]`);
+        const ai = document.querySelector(`.char-adv-input[data-char="${charAbbr}"]`);
+        const ce = document.querySelector(`.char-cur[data-char="${charAbbr}"]`);
+        if (!si || !ai || !ce) return;
+        ce.textContent = (parseInt(si.value) || 0) + (parseInt(ai.value) || 0);
+        updateAllTotals();
+    }
+    document.querySelectorAll('.char-start-input').forEach(i => i.addEventListener('input', () => updateCharCurrent(i.dataset.char)));
+    document.querySelectorAll('.char-adv-input').forEach(i  => i.addEventListener('input', () => updateCharCurrent(i.dataset.char)));
+    document.querySelectorAll('.char-adv-plus').forEach(btn => btn.addEventListener('click', () => {
+        const inp = document.querySelector(`.char-adv-input[data-char="${btn.dataset.char}"]`);
+        if (inp) { inp.value = Math.min(99, (parseInt(inp.value)||0) + 1); updateCharCurrent(btn.dataset.char); }
+    }));
+    document.querySelectorAll('.char-adv-minus').forEach(btn => btn.addEventListener('click', () => {
+        const inp = document.querySelector(`.char-adv-input[data-char="${btn.dataset.char}"]`);
+        if (inp) { inp.value = Math.max(0, (parseInt(inp.value)||0) - 1); updateCharCurrent(btn.dataset.char); }
+    }));
+
+    // ── Skill + Spec totals (×5 per advance) ────────────────────────
+    function updateAllTotals() {
+        const cv = getCharCurrentMap();
+        document.querySelectorAll('.skill-row').forEach(row => {
+            const adv = parseInt(row.querySelector('.sk-adv')?.value) || 0;
+            const tot = row.querySelector('.sk-total');
+            if (tot) tot.textContent = (cv[row.dataset.char] || 0) + adv * 5;
+        });
+        document.querySelectorAll('.spec-row').forEach(row => {
+            const specAdv  = parseInt(row.querySelector('.sp-adv')?.value) || 0;
+            const skillAdv = parseInt(row.dataset.skillAdv) || 0;
+            const tot      = row.querySelector('.spec-total');
+            if (tot) tot.textContent = (cv[row.dataset.char] || 0) + (specAdv + skillAdv) * 5;
+        });
+        updateDerived();
+    }
+
+    // ── Skill +/− ───────────────────────────────────────────────────
+    document.querySelectorAll('.skill-row').forEach(row => {
+        const inp = row.querySelector('.sk-adv');
+        if (!inp) return;
+        row.querySelector('.sk-plus')?.addEventListener('click',  () => { const v = parseInt(inp.value)||0; if (v < 4) { inp.value = v+1; updateAllTotals(); } });
+        row.querySelector('.sk-minus')?.addEventListener('click', () => { const v = parseInt(inp.value)||0; if (v > 0) { inp.value = v-1; updateAllTotals(); } });
+        inp.addEventListener('input', updateAllTotals);
+    });
+
+    // ── Spec +/− ────────────────────────────────────────────────────
+    document.querySelectorAll('.spec-row').forEach(row => {
+        const inp = row.querySelector('.sp-adv');
+        if (!inp) return;
+        row.querySelector('.sp-plus')?.addEventListener('click',  () => { const v = parseInt(inp.value)||0; if (v < 4) { inp.value = v+1; updateAllTotals(); } });
+        row.querySelector('.sp-minus')?.addEventListener('click', () => { const v = parseInt(inp.value)||0; if (v > 0) { inp.value = v-1; updateAllTotals(); } });
+        inp.addEventListener('input', updateAllTotals);
+    });
+
+    // ── Derived stats ────────────────────────────────────────────────
+    function getDodgeTotal() {
+        const agVal = charCurVal(CHAR_AG);
+        let dodgeAdv = 0;
+        document.querySelectorAll('.skill-row').forEach(row => {
+            const nm = row.querySelector('.sk-name');
+            if (nm && nm.textContent.trim().toLowerCase() === 'dodge') {
+                dodgeAdv = parseInt(row.querySelector('.sk-adv')?.value) || 0;
+            }
+        });
+        return agVal + dodgeAdv * 5;
+    }
+
+    function updateDerived() {
+        const agB  = bonus(CHAR_AG);
+        const ini  = bonus(CHAR_PER) + agB;
+        const wMax = bonus(CHAR_S) + 2 * bonus(CHAR_T) + bonus(CHAR_WP);
+        const dodge = getDodgeTotal();
+
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        set('initiative-val',   ini);
+        set('combat-initiative', ini);
+        set('wounds-max',       wMax);
+        set('combat-dodge',     dodge);
+        set('spd-half',   agB);
+        set('spd-full',   agB * 2);
+        set('spd-charge', agB * 3);
+        set('spd-run',    agB * 6);
+
+        const wCur = document.getElementById('wounds-cur');
+        if (wCur && !wCur._touched) wCur.value = wMax;
+    }
+
+    document.getElementById('wounds-cur')?.addEventListener('input', function() { this._touched = true; });
+    updateAllTotals();
+
+    // ── Fate Points ──────────────────────────────────────────────────
+    function shiftFatePoints(delta) {
+        const totalEl = document.querySelector('.fate-threshold');
+        const curEl   = document.getElementById('id-fate-cur');
+        if (!totalEl) return;
+        const newTotal = Math.max(1, (parseInt(totalEl.textContent) || 3) + delta);
+        totalEl.textContent = newTotal;
+        if (curEl) {
+            curEl.max = String(newTotal);
+            if (parseInt(curEl.value) > newTotal) curEl.value = String(newTotal);
+        }
+    }
+
+    // ── Tags ─────────────────────────────────────────────────────────
+    function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function createTag(text, desc) {
+        const span = document.createElement('span');
+        span.className = 'sm-tag removable-tag';
+        if (desc) span.dataset.desc = desc;
+        const label = document.createElement('span'); label.className = 'tag-text'; label.textContent = text;
+        const btn   = document.createElement('button'); btn.type = 'button'; btn.className = 'tag-remove-btn'; btn.textContent = '×';
+        btn.onclick = function() { removeTag(this); };
+        span.appendChild(label); span.appendChild(btn);
+        return span;
+    }
+    function addToCloud(cloudId, inputId, descMap) {
+        const inp = document.getElementById(inputId);
+        const text = inp.value.trim(); if (!text) return;
+        // No duplicates
+        const cloud = document.getElementById(cloudId);
+        const already = [...cloud.querySelectorAll('.tag-text')]
+            .some(el => el.textContent.trim().toLowerCase() === text.toLowerCase());
+        if (already) { inp.value = ''; return; }
+        const desc = descMap ? (descMap[text] || '') : '';
+        cloud.appendChild(createTag(text, desc));
+        inp.value = '';
+        if (cloudId === 'talentCloud' && text.toLowerCase() === 'fated') shiftFatePoints(+1);
+    }
+    function removeTag(btn) {
+        const tag   = btn.closest('.removable-tag');
+        const cloud = tag.closest('.tag-cloud');
+        const nm    = tag.querySelector('.tag-text');
+        if (cloud?.id === 'talentCloud' && nm?.textContent.trim().toLowerCase() === 'fated') {
+            shiftFatePoints(-1);
+        }
+        tag.remove();
+    }
+
+    // ── Autocomplete ─────────────────────────────────────────────────
+    function makeAutocomplete(inputId, dropdownId, names, descMap, cloudId) {
+        const inp  = document.getElementById(inputId);
+        const drop = document.getElementById(dropdownId);
+        if (!inp || !drop) return;
+        function close() { drop.classList.remove('open'); drop.innerHTML = ''; }
+        inp.addEventListener('input', () => {
+            const q = inp.value.trim().toLowerCase();
+            if (!q) { close(); return; }
+            const hits = names.filter(n => n.toLowerCase().includes(q)).slice(0, 24);
+            if (!hits.length) { close(); return; }
+            drop.innerHTML = hits.map(n => `<div class="ac-item">${escHtml(n)}</div>`).join('');
+            drop.querySelectorAll('.ac-item').forEach(item =>
+                item.addEventListener('mousedown', e => { e.preventDefault(); inp.value = item.textContent; close(); addToCloud(cloudId, inputId, descMap); }));
+            drop.classList.add('open');
+        });
+        inp.addEventListener('blur',    () => setTimeout(close, 150));
+        inp.addEventListener('keydown', e => {
+            if (e.key === 'Enter')  { e.preventDefault(); close(); addToCloud(cloudId, inputId, descMap); }
+            if (e.key === 'Escape') close();
+        });
+    }
+
+    makeAutocomplete('talentInput', 'talentDropdown', allTalentNames,   talentDescMap,  'talentCloud');
+    makeAutocomplete('equipInput',  'equipDropdown',  allInventoryNames, null,           'equipCloud');
+    makeAutocomplete('mutInput',    'mutDropdown',    allMutationNames,  mutationDescMap,'mutCloud');
+
+
+    document.querySelectorAll('#talentCloud .tag-text').forEach(span => {
+        const name = span.textContent.trim();
+        const desc = talentDescMap[name];
+        if (desc) span.closest('.sm-tag').dataset.desc = desc;
+    });
+</script>
+
+<footer>
+    <span class="footer-left">Imperium Maledictum</span>
+    <span class="footer-right">© Games Workshop Ltd</span>
+</footer>
+
+</body>
+</html>

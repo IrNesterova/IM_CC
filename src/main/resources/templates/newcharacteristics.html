@@ -1,872 +1,334 @@
 <!DOCTYPE html>
-<html lang="ru"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Imperium Maledictum — Characteristics</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=EB+Garamond:wght@400;500;700&display=swap"
-          rel="stylesheet">
-
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
     <style>
-
-        :root{
-            --bg:#090807;
-            --panel:#15120f;
-            --gold:#b89b5e;
-            --bone:#e7dcc5;
-            --text:#d0c6b6;
-            --muted:#988d7c;
+        .container {
+            width: 100%;
+            max-width: 860px;
+            margin: auto;
+            padding: 24px 32px 60px;
         }
 
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
+        .main-panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            padding: 28px;
+            box-shadow: 0 2px 16px var(--shadow);
+            position: relative;
         }
 
-        body{
-            background:
-                    linear-gradient(rgba(0,0,0,0.84),
-                    rgba(0,0,0,0.94)),
-                    url("https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2200&auto=format&fit=crop");
-
-            background-size:cover;
-            background-position:center;
-            background-attachment:fixed;
-
-            color:var(--text);
-
-            font-family:'EB Garamond',serif;
-
-            min-height:100vh;
+        .main-panel::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--red), transparent);
         }
 
-        body::before{
-            content:"";
-
-            position:fixed;
-            inset:0;
-
-            background:
-                    radial-gradient(circle at top,
-                    rgba(184,155,94,0.08),
-                    transparent 35%);
-
-            pointer-events:none;
+        /* Methods */
+        .methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 36px;
         }
 
-        .noise{
-            position:fixed;
-            inset:0;
-
-            background-image:
-                    url("https://www.transparenttextures.com/patterns/dark-leather.png");
-
-            opacity:0.18;
-
-            pointer-events:none;
+        .method {
+            padding: 14px 18px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: 0.2s ease;
         }
 
-        /* ========================= */
-        /* HEADER */
-        /* ========================= */
+        .method:hover { border-color: var(--red); transform: translateY(-2px); }
 
-        .header{
-            text-align:center;
-
-            padding:70px 20px 40px;
+        .method.active {
+            border-color: var(--red);
+            background: rgba(8,93,101,0.06);
+            box-shadow: inset 0 0 0 1px var(--line);
         }
 
-        .eyebrow{
-            color:var(--gold);
-
-            letter-spacing:4px;
-            text-transform:uppercase;
-
-            font-size:13px;
-
-            margin-bottom:18px;
+        .method-title {
+            font-family: 'Cinzel', serif;
+            color: var(--red);
+            font-size: 15px;
+            margin-bottom: 6px;
         }
 
-        h1{
-            font-family:'Cinzel',serif;
+        .method-desc { color: var(--muted); font-size: 17px; line-height: 1.55; }
 
-            font-size:72px;
-            line-height:0.92;
-
-            text-transform:uppercase;
-
-            color:var(--bone);
-
-            margin-bottom:22px;
+        /* Points box */
+        .points-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--line);
+            background: rgba(8,93,101,0.05);
         }
 
-        h1 span{
-            color:var(--gold);
+        .points-title {
+            font-family: 'Cinzel', serif;
+            color: var(--red);
+            font-size: 15px;
         }
 
-        .separator{
-            width:240px;
-            height:2px;
-
-            margin:30px auto;
-
-            background:
-                    linear-gradient(
-                            90deg,
-                            transparent,
-                            var(--gold),
-                            transparent
-                    );
+        .points-value {
+            font-family: 'Cinzel', serif;
+            color: var(--ink);
+            font-size: 28px;
         }
 
-        .subtitle{
-            max-width:900px;
-            margin:auto;
-
-            font-size:24px;
-            line-height:1.7;
-
-            color:var(--text);
+        /* Char list */
+        .char-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        /* ========================= */
-        /* MAIN */
-        /* ========================= */
-
-        .container{
-            width:100%;
-            max-width:1450px;
-
-            margin:auto;
-
-            padding:40px;
+        .char-card {
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.35);
+            transition: 0.18s ease;
         }
 
-        .panel{
-            background:
-                    linear-gradient(
-                            180deg,
-                            rgba(24,20,17,0.96),
-                            rgba(10,9,8,0.98)
-                    );
-
-            border:1px solid rgba(184,155,94,0.15);
-
-            padding:40px;
-
-            box-shadow:
-                    0 0 40px rgba(0,0,0,0.45);
+        .char-card:hover {
+            border-color: var(--line-strong);
+            transform: translateY(-1px);
         }
 
-        /* ========================= */
-        /* METHODS */
-        /* ========================= */
-
-        .methods{
-            display:grid;
-
-            grid-template-columns:repeat(3,1fr);
-
-            gap:24px;
-
-            margin-bottom:42px;
+        .char-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 10px 16px;
         }
 
-        .method{
-            padding:30px;
+        .char-left { flex: 1; }
 
-            border:1px solid rgba(184,155,94,0.12);
-
-            background:
-                    linear-gradient(
-                            180deg,
-                            rgba(184,155,94,0.08),
-                            rgba(184,155,94,0.02)
-                    );
-
-            cursor:pointer;
-
-            transition:0.25s ease;
+        .char-name {
+            font-family: 'Cinzel', serif;
+            color: var(--ink);
+            font-size: 18px;
+            margin-bottom: 2px;
         }
 
-        .method:hover{
-            transform:translateY(-4px);
-
-            border-color:rgba(184,155,94,0.28);
+        .char-desc {
+            color: var(--muted);
+            font-size: 17px;
+            line-height: 1.55;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.25s ease, opacity 0.2s ease;
         }
 
-        .method.active{
-            border-color:var(--gold);
-
-            box-shadow:
-                    inset 0 0 30px rgba(184,155,94,0.05);
+        .char-card:hover .char-desc {
+            max-height: 80px;
+            opacity: 1;
         }
 
-        .method-title{
-            font-family:'Cinzel',serif;
-
-            color:var(--gold);
-
-            font-size:26px;
-
-            margin-bottom:12px;
+        /* Controls */
+        .char-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
         }
 
-        .method-desc{
-            color:var(--muted);
-
-            font-size:18px;
-
-            line-height:1.6;
+        .char-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--red-dark);
+            cursor: pointer;
+            font-size: 20px;
+            color: #f2f3ed;
+            background: linear-gradient(180deg, var(--red) 0%, var(--red-dark) 100%);
+            transition: 0.18s ease;
         }
 
-        /* ========================= */
-        /* POINTS */
-        /* ========================= */
-
-        .points-box{
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-
-            padding:24px 30px;
-
-            margin-bottom:34px;
-
-            border:1px solid rgba(184,155,94,0.14);
-
-            background:
-                    linear-gradient(
-                            180deg,
-                            rgba(184,155,94,0.10),
-                            rgba(184,155,94,0.03)
-                    );
+        .char-btn:hover {
+            background: linear-gradient(180deg, #8f1414 0%, #4d0909 100%);
         }
 
-        .points-title{
-            font-family:'Cinzel',serif;
-
-            color:var(--gold);
-
-            font-size:24px;
-        }
-
-        .points-value{
-            font-family:'Cinzel',serif;
-
-            color:var(--bone);
-
-            font-size:42px;
-        }
-
-        /* ========================= */
-        /* CHARACTERISTICS */
-        /* ========================= */
-
-        .char-list{
-            display:flex;
-            flex-direction:column;
-
-            gap:18px;
-        }
-
-        .char-card{
-            background:
-                    linear-gradient(
-                            180deg,
-                            rgba(32,26,20,0.95),
-                            rgba(15,12,10,0.98)
-                    );
-
-            border:1px solid rgba(184,155,94,0.10);
-
-            transition:0.25s ease;
-        }
-
-        .char-card:hover{
-            border-color:rgba(184,155,94,0.24);
-
-            transform:translateY(-2px);
-        }
-
-        .char-inner{
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-
-            gap:30px;
-
-            padding:26px 30px;
-        }
-
-        .char-left{
-            max-width:700px;
-        }
-
-        .char-name{
-            font-family:'Cinzel',serif;
-
-            color:var(--gold);
-
-            font-size:30px;
-
-            margin-bottom:8px;
-        }
-
-        .char-desc{
-            color:var(--muted);
-
-            font-size:18px;
-
-            line-height:1.6;
-        }
-
-        /* ========================= */
-        /* CONTROLS */
-        /* ========================= */
-
-        .char-controls{
-            display:flex;
-            align-items:center;
-
-            gap:14px;
-        }
-
-        .char-btn{
-            width:52px;
-            height:52px;
-
-            border:none;
-
-            cursor:pointer;
-
-            font-size:28px;
-
-            color:var(--bone);
-
-            background:
-                    linear-gradient(
-                            180deg,
-                            #4c3b22 0%,
-                            #2a2114 100%
-                    );
-
-            transition:0.2s ease;
-        }
-
-        .char-btn:hover{
-            background:
-                    linear-gradient(
-                            180deg,
-                            #6d5530 0%,
-                            #3a2d1b 100%
-                    );
-        }
-
-        .char-value{
-            width:92px;
-
-            text-align:center;
-
-            font-family:'Cinzel',serif;
-
-            font-size:38px;
-
-            color:var(--bone);
-
-            padding:10px 0;
-
-            border:1px solid rgba(184,155,94,0.12);
-
-            background:
-                    linear-gradient(
-                            180deg,
-                            rgba(184,155,94,0.10),
-                            rgba(184,155,94,0.03)
-                    );
-
-            outline:none;
+        .char-value {
+            width: 64px;
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            color: var(--ink);
+            padding: 5px 0;
+            border: 1px solid var(--line-strong);
+            background: rgba(255,255,255,0.7);
+            outline: none;
         }
 
         .char-value::-webkit-outer-spin-button,
-        .char-value::-webkit-inner-spin-button{
-            -webkit-appearance:none;
-            margin:0;
+        .char-value::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        .footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 36px;
         }
 
-        /* ========================= */
-        /* FOOTER */
-        /* ========================= */
-
-        .footer{
-            display:flex;
-            justify-content:flex-end;
-
-            margin-top:42px;
+        @media (max-width: 700px) {
+            .methods { grid-template-columns: 1fr; }
+            .char-list { grid-template-columns: 1fr; }
         }
 
-        .submit-btn{
-            padding:20px 44px;
-
-            border:none;
-
-            cursor:pointer;
-
-            font-family:'Cinzel',serif;
-
-            font-size:17px;
-            font-weight:700;
-
-            letter-spacing:1px;
-
-            color:#140f08;
-
-            background:
-                    linear-gradient(
-                            180deg,
-                            #d0b67c 0%,
-                            #947743 100%
-                    );
-
-            transition:0.25s ease;
+        @media (max-width: 640px) {
+            .container { padding: 20px; }
+            .main-panel { padding: 24px; }
+            .char-inner { flex-direction: column; align-items: flex-start; }
+            .char-controls { width: 100%; justify-content: flex-end; }
+            h1 { font-size: 44px; }
         }
-
-        .submit-btn:hover{
-            transform:translateY(-3px);
-        }
-
-        @media(max-width:1000px){
-
-            .methods{
-                grid-template-columns:1fr;
-            }
-
-            .char-inner{
-                flex-direction:column;
-                align-items:flex-start;
-            }
-
-            .char-controls{
-                width:100%;
-                justify-content:flex-end;
-            }
-        }
-
-        @media(max-width:700px){
-
-            h1{
-                font-size:48px;
-            }
-
-            .subtitle{
-                font-size:20px;
-            }
-
-            .container{
-                padding:20px;
-            }
-
-            .char-name{
-                font-size:24px;
-            }
-        }
-
     </style>
-
 </head>
-
 <body>
 
-<div class="noise"></div>
+<div class="topbar">
+    <span class="topbar-game">Warhammer 40,000 Roleplay</span>
+    <div class="topbar-divider"></div>
+    <span class="topbar-sub">Character Creator</span>
+</div>
 
-<section class="header">
-
-    <div class="eyebrow">
-        WARHAMMER 40,000 ROLEPLAY
-    </div>
-
-    <h1>
-        Character<br>
-        <span>Characteristics</span>
-    </h1>
-
+<section class="page-header">
+    <div class="eyebrow">Warhammer 40,000 Roleplay</div>
+    <h1>Character<br><span>Characteristics</span></h1>
     <div class="separator"></div>
-
     <div class="subtitle">
-        Strength, faith, cunning and willpower
-        determine your survival in the darkness
-        of the Imperium.
+        Strength, faith, cunning and willpower determine your survival
+        in the darkness of the Imperium.
     </div>
-
 </section>
 
 <div class="container">
-
-    <div class="panel">
+    <div class="main-panel">
 
         <!-- METHODS -->
-
         <div class="methods">
-
-            <div class="method active"
-                 data-mode="manual">
-
-                <div class="method-title">
-                    Manual Assignment
-                </div>
-
-                <div class="method-desc">
-                    Freely edit characteristics
-                    without restrictions.
-                </div>
-
+            <div class="method active" data-mode="manual">
+                <div class="method-title">Manual Assignment</div>
+                <div class="method-desc">Freely edit characteristics without restrictions.</div>
             </div>
-
-            <div class="method"
-                 data-mode="roll">
-
-                <div class="method-title">
-                    Random Roll
-                </div>
-
-                <div class="method-desc">
-                    Roll 2d10 + 20
-                    for every characteristic.
-                </div>
-
+            <div class="method" data-mode="roll">
+                <div class="method-title">Random Roll</div>
+                <div class="method-desc">Roll 2d10 + 20 for every characteristic.</div>
             </div>
-
-            <div class="method"
-                 data-mode="points">
-
-                <div class="method-title">
-                    90 Point Pool
-                </div>
-
-                <div class="method-desc">
-                    Base value is 20.
-                    Minimum final value is 24.
-                </div>
-
+            <div class="method" data-mode="points">
+                <div class="method-title">90 Point Pool</div>
+                <div class="method-desc">Base value is 20. Minimum final value is 24.</div>
             </div>
-
         </div>
 
         <!-- POINTS -->
-
         <div class="points-box">
-
-            <div class="points-title">
-                Remaining Points
-            </div>
-
-            <div class="points-value"
-                 id="remainingPoints">
-
-                FREE
-
-            </div>
-
+            <div class="points-title">Remaining Points</div>
+            <div class="points-value" id="remainingPoints">FREE</div>
         </div>
 
         <!-- CHARACTERISTICS -->
         <form th:action="@{/character/characteristics}" method="post">
-        <div class="char-list">
-
-            <div class="char-card"
-                 th:each="char : ${allCharacteristicsList}">
-
-                <div class="char-inner">
-
-                    <div class="char-left">
-
-                        <div class="char-name"
-                             th:text="${char.full_name}">
-
-                            Weapon Skill
-
+            <div class="char-list">
+                <div class="char-card" th:each="char : ${allCharacteristicsList}">
+                    <div class="char-inner">
+                        <div class="char-left">
+                            <div class="char-name" th:text="${char.full_name}">Weapon Skill</div>
+                            <div class="char-desc" th:text="${char.description}">Description</div>
                         </div>
-
-                        <div class="char-desc"
-                             th:text="${char.description}">
-
-                            Description
-
+                        <div class="char-controls">
+                            <button type="button" class="char-btn minus">−</button>
+                            <input type="number" class="char-value" value="24" th:name="${char.name}">
+                            <button type="button" class="char-btn plus">+</button>
                         </div>
-
                     </div>
-
-                    <div class="char-controls">
-
-                        <button type="button"
-                                class="char-btn minus">
-
-                            −
-
-                        </button>
-
-                        <input type="number"
-                               class="char-value"
-                               value="24" th:name="${char.name}">
-
-                        <button type="button"
-                                class="char-btn plus">
-
-                            +
-
-                        </button>
-
-                    </div>
-
                 </div>
-
             </div>
 
-        </div>
-
-        <!-- FOOTER -->
-
-
             <div class="footer">
-
-                <button type="submit" class="submit-btn">
-
-                    Continue Character Creation
-
-                </button>
-
+                <button type="submit" class="submit-btn">Continue Character Creation</button>
             </div>
         </form>
 
     </div>
-
 </div>
 
 <script>
-
     let mode = "manual";
-
-    const BASE_VALUE = 20;
-    const MIN_VALUE = 24;
-    const MAX_VALUE = 38;
-
-    const methods =
-        document.querySelectorAll(".method");
-
-    const remainingPointsEl =
-        document.getElementById("remainingPoints");
-
-    const characteristicCards =
-        document.querySelectorAll(".char-card");
-
-    const CHARACTERISTIC_COUNT =
-        characteristicCards.length;
-
+    const BASE_VALUE = 20, MIN_VALUE = 24, MAX_VALUE = 38;
+    const methods = document.querySelectorAll(".method");
+    const remainingPointsEl = document.getElementById("remainingPoints");
+    const characteristicCards = document.querySelectorAll(".char-card");
+    const CHARACTERISTIC_COUNT = characteristicCards.length;
     let poolPoints = 0;
 
-    // =========================
-    // METHOD SWITCH
-    // =========================
-
     methods.forEach(method => {
-
         method.addEventListener("click", () => {
-
-            methods.forEach(m =>
-                m.classList.remove("active"));
-
+            methods.forEach(m => m.classList.remove("active"));
             method.classList.add("active");
-
             mode = method.dataset.mode;
-
-            // MANUAL
-
-            if(mode === "manual"){
-
-                remainingPointsEl.textContent = "FREE";
-            }
-
-            // ROLL
-
-            if(mode === "roll"){
-
-                remainingPointsEl.textContent = "—";
-
-                rollCharacteristics();
-            }
-
-            // POINT BUY
-
-            if(mode === "points"){
-
-                resetPointPool();
-            }
-
+            if (mode === "manual") { remainingPointsEl.textContent = "FREE"; }
+            if (mode === "roll") { remainingPointsEl.textContent = "—"; rollCharacteristics(); }
+            if (mode === "points") { resetPointPool(); }
         });
-
     });
-
-    // =========================
-    // CONTROLS
-    // =========================
 
     characteristicCards.forEach(card => {
-
-        const minus =
-            card.querySelector(".minus");
-
-        const plus =
-            card.querySelector(".plus");
-
-        const valueEl =
-            card.querySelector(".char-value");
-
+        const minus = card.querySelector(".minus");
+        const plus = card.querySelector(".plus");
+        const valueEl = card.querySelector(".char-value");
         let value = 24;
 
-        // sync manual typing
-
-        valueEl.addEventListener("input", () => {
-
-            value =
-                parseInt(valueEl.value) || 0;
-
-        });
-
-        // =====================
-        // PLUS
-        // =====================
+        valueEl.addEventListener("input", () => { value = parseInt(valueEl.value) || 0; });
 
         plus.addEventListener("click", () => {
-
-            // MANUAL MODE
-
-            if(mode === "manual"){
-
-                value++;
-
-                valueEl.value = value;
-
-                return;
+            if (mode === "manual") { value++; valueEl.value = value; return; }
+            if (mode === "points") {
+                if (value >= MAX_VALUE || poolPoints <= 0) return;
+                poolPoints--; remainingPointsEl.textContent = poolPoints;
+                value++; valueEl.value = value;
             }
-
-            // POINT BUY
-
-            if(mode === "points"){
-
-                if(value >= MAX_VALUE) return;
-
-                if(poolPoints <= 0) return;
-
-                poolPoints--;
-
-                remainingPointsEl.textContent =
-                    poolPoints;
-
-                value++;
-
-                valueEl.value = value;
-
-                return;
-            }
-
         });
-
-        // =====================
-        // MINUS
-        // =====================
 
         minus.addEventListener("click", () => {
-
-            // MANUAL MODE
-
-            if(mode === "manual"){
-
-                value--;
-
-                valueEl.value = value;
-
-                return;
+            if (mode === "manual") { value--; valueEl.value = value; return; }
+            if (mode === "points") {
+                if (value <= MIN_VALUE) return;
+                poolPoints++; remainingPointsEl.textContent = poolPoints;
+                value--; valueEl.value = value;
             }
-
-            // POINT BUY
-
-            if(mode === "points"){
-
-                if(value <= MIN_VALUE) return;
-
-                poolPoints++;
-
-                remainingPointsEl.textContent =
-                    poolPoints;
-
-                value--;
-
-                valueEl.value = value;
-
-                return;
-            }
-
         });
-
     });
 
-    // =========================
-    // RESET POINT BUY
-    // =========================
-
-    function resetPointPool(){
-
-        characteristicCards.forEach(card => {
-
-            const valueEl =
-                card.querySelector(".char-value");
-
-            valueEl.value = MIN_VALUE;
-
-        });
-
-        const spent =
-            CHARACTERISTIC_COUNT *
-            (MIN_VALUE - BASE_VALUE);
-
+    function resetPointPool() {
+        characteristicCards.forEach(card => { card.querySelector(".char-value").value = MIN_VALUE; });
+        const spent = CHARACTERISTIC_COUNT * (MIN_VALUE - BASE_VALUE);
         poolPoints = 90 - spent;
-
-        remainingPointsEl.textContent =
-            poolPoints;
+        remainingPointsEl.textContent = poolPoints;
     }
 
-    // =========================
-    // RANDOM ROLL
-    // =========================
-
-    function rollCharacteristics(){
-
+    function rollCharacteristics() {
         characteristicCards.forEach(card => {
-
-            const valueEl =
-                card.querySelector(".char-value");
-
-            const d10_1 =
-                Math.floor(Math.random() * 10) + 1;
-
-            const d10_2 =
-                Math.floor(Math.random() * 10) + 1;
-
-            const result =
-                d10_1 + d10_2 + 20;
-
-            valueEl.value = result;
-
+            const valueEl = card.querySelector(".char-value");
+            valueEl.value = Math.floor(Math.random() * 10) + 1 + Math.floor(Math.random() * 10) + 1 + 20;
         });
     }
-
 </script>
+
+
+<footer>
+    <span class="footer-left">Imperium Maledictum</span>
+    <span class="footer-right">© Games Workshop Ltd</span>
+</footer>
 
 </body>
 </html>

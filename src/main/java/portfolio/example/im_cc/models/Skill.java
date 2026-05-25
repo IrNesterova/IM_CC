@@ -21,6 +21,12 @@ public class Skill {
     @Transient
     private List<Specialization> specializationList;
 
+    public List<Specialization> getSpecializationList() { return specializationList; }
+    public void setSpecializationList(List<Specialization> specializationList) { this.specializationList = specializationList; }
+
+    public Characteristics getCharacteristics() { return characteristics; }
+    public void setCharacteristics(Characteristics characteristics) { this.characteristics = characteristics; }
+
     public String getName() {
         return name;
     }
