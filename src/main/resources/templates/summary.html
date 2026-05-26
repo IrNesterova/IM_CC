@@ -185,8 +185,11 @@
 
         /* ── Actions bar ── */
         .page-actions { text-align: center; padding: 18px 0 0; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; align-items: center; }
-        .save-code-box { font-family: 'Cinzel', serif; font-size: 12px; color: var(--ink); padding: 5px 10px; border: 1px solid var(--line-strong); background: rgba(8,93,101,0.05); letter-spacing: 2px; }
+        .save-code-box { font-family: 'Cinzel', serif; font-size: 12px; color: var(--ink); padding: 5px 10px; border: 1px solid var(--line-strong); background: rgba(8,93,101,0.05); letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
         .save-code-box strong { color: var(--red); font-size: 14px; letter-spacing: 3px; }
+        .copy-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-family: 'Cinzel', serif; letter-spacing: 1px; padding: 2px 7px; cursor: pointer; transition: 0.15s; white-space: nowrap; }
+        .copy-btn:hover { border-color: var(--red); color: var(--red); }
+        .copy-btn.copied { border-color: var(--ink); color: var(--ink); }
         .load-group { display: flex; gap: 5px; align-items: center; }
         #load-code-input { width: 90px; text-transform: uppercase; letter-spacing: 2px; text-align: center; font-family: 'Cinzel', serif; }
 
@@ -706,6 +709,7 @@
     <button class="submit-btn" onclick="saveCharacter()">Save Character</button>
     <div id="save-code-display" class="save-code-box" style="display:none;">
         Saved — Code: <strong id="save-code-val"></strong>
+        <button class="copy-btn" onclick="copyCode()" id="copy-btn">Copy</button>
     </div>
     <div class="load-group">
         <input type="text" class="add-input" id="load-code-input" placeholder="Code…" maxlength="6">
@@ -1114,6 +1118,16 @@ const CHAR_WP  = 'WIL';
         if (!code) return;
         document.getElementById('save-code-val').textContent = code;
         document.getElementById('save-code-display').style.display = '';
+    }
+    function copyCode() {
+        const code = document.getElementById('save-code-val').textContent.trim();
+        if (!code) return;
+        navigator.clipboard.writeText(code).then(() => {
+            const btn = document.getElementById('copy-btn');
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+        });
     }
     if (pendingSaveCode) showSaveCode(pendingSaveCode);
 </script>
